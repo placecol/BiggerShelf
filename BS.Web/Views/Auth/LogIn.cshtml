@@ -1,0 +1,31 @@
+﻿@model Kaiser.BiggerShelf.Web.Models.Views.Login
+@{
+    ViewBag.Title = "Login to Bigger Shelf";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="login-form">
+        <legend>Enter your email and password</legend>
+        <div class="fieldgroup">
+            @Html.LabelFor(l => l.Email)
+            @Html.TextBoxFor(l => l.Email)
+            @Html.ValidationMessageFor(model => model.Email)
+        </div>
+        
+        <div class="fieldgroup">
+            @Html.LabelFor(l => l.Password)
+            @Html.TextBoxFor(l => l.Password)
+            @Html.ValidationMessageFor(model => model.Password)
+        </div>
+        
+        <div class="fieldgroup">
+            @Html.CheckBoxFor(l => l.Persistent)
+            Keep me logged in
+            @Html.ValidationMessageFor(model => model.Persistent)
+        </div>
+    </fieldset>
+    <button type="submit">Login</button>
+}

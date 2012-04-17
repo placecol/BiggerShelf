@@ -1,0 +1,20 @@
+{
+  "Name": "Book/ByTitle",
+  "Map": "docs.Books\r\n\t.Select(book => new () {Title = book.Title, Id = book.__document_id})",
+  "Maps": [
+    "docs.Books\r\n\t.Select(book => new () {Title = book.Title, Id = book.__document_id})"
+  ],
+  "Reduce": "results\r\n\t.GroupBy(result => result.Id)\r\n\t.SelectMany(g => g, (g, book) => new () {Title = book.Title, Id = book.Id})",
+  "TransformResults": null,
+  "IsMapReduce": true,
+  "IsCompiled": false,
+  "IsTemp": false,
+  "Stores": {},
+  "Indexes": {
+    "Title": "Analyzed"
+  },
+  "SortOptions": {},
+  "Analyzers": {},
+  "Fields": [],
+  "Type": "MapReduce"
+}

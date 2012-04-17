@@ -1,0 +1,40 @@
+﻿@model Kaiser.BiggerShelf.Web.Models.Profile
+@{
+    ViewBag.Title = "Bigger Shelf";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div data-bind="with: profile">
+    <h2>Books for <span data-bind="text: Email"></span></h2>
+    <ul data-bind="foreach: ReadingList">
+        <li data-bind="text: Id"></li>
+    </ul>
+</div>
+
+
+<h2>All Books</h2>
+<table>
+    <thead><tr><th>Title</th><th>Author</th><th>Selected</th></tr></thead>
+    <tbody data-bind="foreach: books">
+        <tr>
+            <td data-bind="text: Title" ></td>
+            <td data-bind="text: Author" ></td>
+            <td><input type="checkbox" data-bind="checked: isSelected" /></td>
+        </tr>
+    </tbody>
+</table>
+
+
+@section Script {
+
+    <script src="~/Scripts/knockout.debug.js"></script>
+    <script src="~/Scripts/knockout.mapping-latest.debug.js"></script>
+    <script src="~/Scripts/App/Models/CatalogViewModel.js"></script>
+    <script src="~/Scripts/App/Models/Book.js"></script>
+    <script src="~/Scripts/App/Models/Profile.js"></script>
+    <script>
+        $(function () {
+            ko.applyBindings(new BS.CatalogViewModel({profileId: "@Model.Id"}));
+        });
+    </script>
+}

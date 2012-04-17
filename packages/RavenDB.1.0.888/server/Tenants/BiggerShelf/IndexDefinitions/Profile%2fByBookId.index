@@ -1,0 +1,20 @@
+{
+  "Name": "Profile/ByBookId",
+  "Map": "docs.Profiles\r\n\t.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})",
+  "Maps": [
+    "docs.Profiles\r\n\t.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})"
+  ],
+  "Reduce": "results\r\n\t.GroupBy(result => new {Id = result.Id, ProfileId = result.ProfileId})\r\n\t.SelectMany(g => g\r\n\t.Where(b => b.Id != null).DefaultIfEmpty(), (g, book) => new {g = g, book = book})\r\n\t.Where(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)\r\n\t.Select(__h__TransparentIdentifier1 => new () {Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title})",
+  "TransformResults": "results\r\n\t.GroupBy(result => result.Id)\r\n\t.Select(g => new {g = g, book = Database.Load(g.Key)})\r\n\t.Select(__h__TransparentIdentifier2 => new () {Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title})",
+  "IsMapReduce": true,
+  "IsCompiled": false,
+  "IsTemp": false,
+  "Stores": {},
+  "Indexes": {
+    "Title": "Analyzed"
+  },
+  "SortOptions": {},
+  "Analyzers": {},
+  "Fields": [],
+  "Type": "MapReduce"
+}
