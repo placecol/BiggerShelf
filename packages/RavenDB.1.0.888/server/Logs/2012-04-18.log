@@ -1,0 +1,2234 @@
+time,logger,level,message,exception
+2012-04-18 07:52:11.2788,Raven.Database.Impl.DocumentCacher,Info,"MemoryCache Settings:
+  PhysicalMemoryLimit = 99
+  CacheMemoryLimit    = 3213885440
+  PollingInterval     = 00:02:00",
+2012-04-18 07:52:11.3158,Raven.Storage.Esent.TransactionalStorage,Info,"Esent Settings:
+  MaxVerPages      = 32768
+  CacheSizeMax     = 262144
+  DatabasePageSize = 4096",
+2012-04-18 07:52:14.8155,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Raven%2fDocumentsByEntityName:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 07:52:14.8315,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Raven/DocumentsByEntityName,
+2012-04-18 07:52:14.8784,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Raven/DocumentsByEntityName,
+2012-04-18 07:52:15.4204,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Backup/Status' was not found,
+2012-04-18 07:52:15.9083,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-04-18 07:52:15.9083,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-04-18 07:52:37.2772,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Databases/BiggerShelf' was found,
+2012-04-18 07:52:37.3802,Raven.Database.Impl.DocumentCacher,Info,"MemoryCache Settings:
+  PhysicalMemoryLimit = 99
+  CacheMemoryLimit    = 3213885440
+  PollingInterval     = 00:02:00",
+2012-04-18 07:52:37.3802,Raven.Storage.Esent.TransactionalStorage,Info,"Esent Settings:
+  MaxVerPages      = 32768
+  CacheSizeMax     = 262144
+  DatabasePageSize = 4096",
+2012-04-18 07:52:37.5372,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Databases/BiggerShelf' was found,
+2012-04-18 07:52:37.5852,Raven.Database.Server.HttpServer,Debug,Request #   1: GET     -    60 ms - <default>  - 200 - /docs/Raven/Databases/BiggerShelf,
+2012-04-18 07:52:37.9311,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Databases/BiggerShelf' was found,
+2012-04-18 07:52:39.5810,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Book%2fByTitle:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Book_2fByTitle : AbstractViewGenerator
+{
+	public Index_Book_2fByTitle()
+	{
+		this.ViewText = @""docs.Books
+	.Select(book => new () {Title = book.Title, Id = book.__document_id})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g, (g, book) => new () {Title = book.Title, Id = book.Id})
+
+"";
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Title = book.Title, Id = book.__document_id, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g)), (Func<dynamic, dynamic, dynamic>)((g, book) => new { Title = book.Title, Id = book.Id }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""Title"");
+		this.AddField(""Id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Book_2fByTitle : AbstractViewGenerator
+{
+	public Index_Book_2fByTitle()
+	{
+		this.ViewText = @""docs.Books
+	.Select(book => new () {Title = book.Title, Id = book.__document_id})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g, (g, book) => new () {Title = book.Title, Id = book.Id})
+
+"";
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Title = book.Title, Id = book.__document_id, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g)), (Func<dynamic, dynamic, dynamic>)((g, book) => new { Title = book.Title, Id = book.Id }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""Title"");
+		this.AddField(""Id"");
+	}
+}
+",
+2012-04-18 07:52:39.7650,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Profile%2fByBookId:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookId : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookId()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})
+results
+	.GroupBy(result => new {Id = result.Id, ProfileId = result.ProfileId})
+	.SelectMany(g => g
+	.Where(b => b.Id != null).DefaultIfEmpty(), (g, book) => new {g = g, book = book})
+	.Where(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)
+	.Select(__h__TransparentIdentifier1 => new () {Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title})
+
+results
+	.GroupBy(result => result.Id)
+	.Select(g => new {g = g, book = Database.Load(g.Key)})
+	.Select(__h__TransparentIdentifier2 => new () {Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = book.Title, __document_id = profile.__document_id })));
+		this.TransformResultsDefinition = (Database, results) => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).Select((Func<IGrouping<dynamic,dynamic>, dynamic>)(g => new { g = g, book = Database.Load(g.Key) })).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier2 => new { Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title }));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => new { Id = result.Id, ProfileId = result.ProfileId })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(b => b.Id != null)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, book) => new { g = g, book = book })).Where((Func<dynamic, bool>)(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier1 => new { Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title }));
+		this.GroupByExtraction = result => new { Id = result.Id, ProfileId = result.ProfileId };
+		this.AddField(""Id"");
+		this.AddField(""ProfileId"");
+		this.AddField(""Title"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookId : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookId()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})
+results
+	.GroupBy(result => new {Id = result.Id, ProfileId = result.ProfileId})
+	.SelectMany(g => g
+	.Where(b => b.Id != null).DefaultIfEmpty(), (g, book) => new {g = g, book = book})
+	.Where(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)
+	.Select(__h__TransparentIdentifier1 => new () {Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title})
+
+results
+	.GroupBy(result => result.Id)
+	.Select(g => new {g = g, book = Database.Load(g.Key)})
+	.Select(__h__TransparentIdentifier2 => new () {Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = book.Title, __document_id = profile.__document_id })));
+		this.TransformResultsDefinition = (Database, results) => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).Select((Func<IGrouping<dynamic,dynamic>, dynamic>)(g => new { g = g, book = Database.Load(g.Key) })).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier2 => new { Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title }));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => new { Id = result.Id, ProfileId = result.ProfileId })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(b => b.Id != null)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, book) => new { g = g, book = book })).Where((Func<dynamic, bool>)(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier1 => new { Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title }));
+		this.GroupByExtraction = result => new { Id = result.Id, ProfileId = result.ProfileId };
+		this.AddField(""Id"");
+		this.AddField(""ProfileId"");
+		this.AddField(""Title"");
+	}
+}
+",
+2012-04-18 07:52:39.8879,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Profile%2fByBookTitle:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookTitle : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookTitle()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty})
+docs.Books
+	.Select(book => new () {Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g
+	.Where(p => p.ProfileId != String.Empty).DefaultIfEmpty(), (g, profile) => new {g = g, profile = profile})
+	.SelectMany(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.g
+	.Where(p => p.ProfileId == String.Empty).DefaultIfEmpty(), (__h__TransparentIdentifier1, book) => new () {ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty, __document_id = profile.__document_id })));
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(p => p.ProfileId != String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, profile) => new { g = g, profile = profile })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(__h__TransparentIdentifier1 => (IEnumerable<dynamic>)(__h__TransparentIdentifier1.g.Where((Func<dynamic, bool>)(p => p.ProfileId == String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((__h__TransparentIdentifier1, book) => new { ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""ProfileId"");
+		this.AddField(""Id"");
+		this.AddField(""Title"");
+		this.AddField(""ASIN"");
+		this.AddField(""Author"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookTitle : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookTitle()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty})
+docs.Books
+	.Select(book => new () {Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g
+	.Where(p => p.ProfileId != String.Empty).DefaultIfEmpty(), (g, profile) => new {g = g, profile = profile})
+	.SelectMany(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.g
+	.Where(p => p.ProfileId == String.Empty).DefaultIfEmpty(), (__h__TransparentIdentifier1, book) => new () {ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty, __document_id = profile.__document_id })));
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(p => p.ProfileId != String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, profile) => new { g = g, profile = profile })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(__h__TransparentIdentifier1 => (IEnumerable<dynamic>)(__h__TransparentIdentifier1.g.Where((Func<dynamic, bool>)(p => p.ProfileId == String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((__h__TransparentIdentifier1, book) => new { ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""ProfileId"");
+		this.AddField(""Id"");
+		this.AddField(""Title"");
+		this.AddField(""ASIN"");
+		this.AddField(""Author"");
+	}
+}
+",
+2012-04-18 07:52:39.8909,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Raven%2fDocumentsByEntityName:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 07:52:40.0179,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Temp%2fProfiles%2fByAspNetUserGuid:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByAspNetUserGuid : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByAspNetUserGuid()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { AspNetUserGuid = doc.AspNetUserGuid }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { AspNetUserGuid = doc.AspNetUserGuid, __document_id = doc.__document_id });
+		this.AddField(""AspNetUserGuid"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""AspNetUserGuid"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""AspNetUserGuid"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByAspNetUserGuid : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByAspNetUserGuid()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { AspNetUserGuid = doc.AspNetUserGuid }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { AspNetUserGuid = doc.AspNetUserGuid, __document_id = doc.__document_id });
+		this.AddField(""AspNetUserGuid"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""AspNetUserGuid"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""AspNetUserGuid"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 07:52:40.1359,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Temp%2fProfiles%2fByEmail:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByEmail : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByEmail()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { Email = doc.Email }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { Email = doc.Email, __document_id = doc.__document_id });
+		this.AddField(""Email"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""Email"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""Email"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByEmail : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByEmail()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { Email = doc.Email }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { Email = doc.Email, __document_id = doc.__document_id });
+		this.AddField(""Email"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""Email"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""Email"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 07:52:40.1359,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Book/ByTitle,
+2012-04-18 07:52:40.1359,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Book/ByTitle,
+2012-04-18 07:52:40.2009,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Profile/ByBookId,
+2012-04-18 07:52:40.2009,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Profile/ByBookId, checking the index for errors. This may take a while.",
+2012-04-18 07:52:40.3599,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Profile/ByBookId took: 00:00:00.1549739, clean: True",
+2012-04-18 07:52:40.3599,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_a numSegments=5 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 5: name=_0 docCount=28
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_2.del]
+    test: open reader.........OK [18 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [53 terms; 112 terms/docs pairs; 40 tokens]
+    test: stored fields.......OK [30 total field count; avg 3.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 5: name=_1 docCount=17
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_2.del]
+    test: open reader.........OK [16 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [36 terms; 68 terms/docs pairs; 4 tokens]
+    test: stored fields.......OK [3 total field count; avg 3.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  3 of 5: name=_2 docCount=15
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_2_2.del]
+    test: open reader.........OK [15 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [32 terms; 60 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  4 of 5: name=_3 docCount=14
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_2.del]
+    test: open reader.........OK [14 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [30 terms; 56 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 5: name=_4 docCount=13
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagn",
+2012-04-18 07:52:40.3599,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Profile/ByBookId,
+2012-04-18 07:52:40.3599,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Profile/ByBookTitle,
+2012-04-18 07:52:40.3599,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Profile/ByBookTitle, checking the index for errors. This may take a while.",
+2012-04-18 07:52:40.4079,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Profile/ByBookTitle took: 00:00:00.0458768, clean: True",
+2012-04-18 07:52:40.4079,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_a numSegments=9 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 9: name=_0 docCount=80
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_2.del]
+    test: open reader.........OK [42 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [109 terms; 240 terms/docs pairs; 114 tokens]
+    test: stored fields.......OK [76 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 9: name=_1 docCount=40
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_2.del]
+    test: open reader.........OK [40 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [37 terms; 120 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  3 of 9: name=_2 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 3 tokens]
+    test: stored fields.......OK [2 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  4 of 9: name=_3 docCount=38
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_2.del]
+    test: open reader.........OK [38 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [35 terms; 114 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 9: name=_4 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 3 tokens]
+    test: stored fields.......OK [2 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  6 of 9: name=_5 docCount=34
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_5_2.del]
+    test: open reader.........OK [34 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [33 terms; 102 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  7 of 9: name=_6 docCount=3
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [5 terms; 9 terms/docs pairs; 9 tokens]
+    test: stored fields.......OK [6 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  8 of 9: name=_7 docCount=32
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [31 terms; 96 terms/docs pairs; 96 tokens]
+    test: stored fields.......OK [64 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  9 of 9: name=_8 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pa",
+2012-04-18 07:52:40.4079,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Profile/ByBookTitle,
+2012-04-18 07:52:40.4229,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Raven/DocumentsByEntityName,
+2012-04-18 07:52:40.4229,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Raven/DocumentsByEntityName, checking the index for errors. This may take a while.",
+2012-04-18 07:52:40.4569,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Raven/DocumentsByEntityName took: 00:00:00.0320517, clean: True",
+2012-04-18 07:52:40.4569,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_6 numSegments=5 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 5: name=_0 docCount=60
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [84 terms; 180 terms/docs pairs; 177 tokens]
+    test: stored fields.......OK [59 total field count; avg 1.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 5: name=_1 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  3 of 5: name=_2 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_2_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  4 of 5: name=_3 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 5: name=_4 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Wi",
+2012-04-18 07:52:40.4569,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Raven/DocumentsByEntityName,
+2012-04-18 07:52:40.4569,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 07:52:40.6079,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 07:52:40.6079,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Temp/Profiles/ByEmail,
+2012-04-18 07:52:40.6079,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Temp/Profiles/ByEmail,
+2012-04-18 07:52:40.6079,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Backup/Status' was not found,
+2012-04-18 07:52:40.6079,Raven.Database.Indexing.IndexStorage,Info,Deleting index Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 07:52:40.6269,Raven.Database.Indexing.WorkContext,Debug,Incremented work counter to 1 because: DELETE INDEX Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 07:52:40.6269,Raven.Database.Indexing.IndexStorage,Info,Deleting index Temp/Profiles/ByEmail,
+2012-04-18 07:52:40.6269,Raven.Database.Indexing.WorkContext,Debug,Incremented work counter to 2 because: DELETE INDEX Temp/Profiles/ByEmail,
+2012-04-18 07:52:40.6269,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 07:52:40.6269,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 2, for: ReducingExecuter, will wait for additional work",
+2012-04-18 07:52:40.6269,Raven.Database.Server.HttpServer,Debug,"Request #   2: GET     - 3,370 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations",
+2012-04-18 07:52:40.6419,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 2, for: IndexingExecuter, will wait for additional work",
+2012-04-18 07:52:40.7399,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Raven/DocumentsByEntityName for: Tag:Profiles,
+2012-04-18 07:52:40.9228,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'profiles/2' was found,
+2012-04-18 07:52:41.0078,Raven.Database.Server.HttpServer,Debug,"Request #   3: GET     - 3,078 ms - BiggerShelf - 200 - /indexes/dynamic/Profiles?query=&start=0&pageSize=1&aggregation=None",
+2012-04-18 07:52:41.0078,Raven.Database.Server.HttpServer,Debug,"	Query: Tag:Profiles
+	Time: 277 ms
+	Index: Raven/DocumentsByEntityName
+	Results: 1 returned out of 8 total.
+",
+2012-04-18 07:52:41.1968,Raven.Database.Server.HttpServer,Debug,Request #   4: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Profile/ByBookId,
+2012-04-18 07:52:41.7388,Raven.Database.Server.HttpServer,Debug,Request #   5: PUT     -    74 ms - BiggerShelf - 201 - /indexes/Profile/ByBookId,
+2012-04-18 07:52:41.7388,Raven.Database.Server.HttpServer,Debug,Request #   6: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Book/ByTitle,
+2012-04-18 07:52:41.7448,Raven.Database.Server.HttpServer,Debug,Request #   7: PUT     -     1 ms - BiggerShelf - 201 - /indexes/Book/ByTitle,
+2012-04-18 07:52:41.7448,Raven.Database.Server.HttpServer,Debug,Request #   8: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Profile/ByBookTitle,
+2012-04-18 07:52:41.7448,Raven.Database.Server.HttpServer,Debug,Request #   9: PUT     -     0 ms - BiggerShelf - 201 - /indexes/Profile/ByBookTitle,
+2012-04-18 08:04:12.8584,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Databases/BiggerShelf' was found,
+2012-04-18 08:04:12.8584,Raven.Database.Server.HttpServer,Debug,Request #  10: GET     -     0 ms - <default>  - 200 - /docs/Raven/Databases/BiggerShelf,
+2012-04-18 08:04:12.9554,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Raven/DocumentsByEntityName for: Tag:Profiles,
+2012-04-18 08:04:12.9554,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'profiles/2' was found,
+2012-04-18 08:04:12.9554,Raven.Database.Server.HttpServer,Debug,Request #  11: GET     -     3 ms - BiggerShelf - 200 - /indexes/dynamic/Profiles?query=&start=0&pageSize=1&aggregation=None,
+2012-04-18 08:04:12.9554,Raven.Database.Server.HttpServer,Debug,"	Query: Tag:Profiles
+	Time: 2 ms
+	Index: Raven/DocumentsByEntityName
+	Results: 1 returned out of 8 total.
+",
+2012-04-18 08:04:13.1384,Raven.Database.Server.HttpServer,Debug,Request #  12: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Profile/ByBookId,
+2012-04-18 08:04:13.1754,Raven.Database.Server.HttpServer,Debug,Request #  13: PUT     -     0 ms - BiggerShelf - 201 - /indexes/Profile/ByBookId,
+2012-04-18 08:04:13.1754,Raven.Database.Server.HttpServer,Debug,Request #  14: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Book/ByTitle,
+2012-04-18 08:04:13.1754,Raven.Database.Server.HttpServer,Debug,Request #  15: PUT     -     0 ms - BiggerShelf - 201 - /indexes/Book/ByTitle,
+2012-04-18 08:04:13.1754,Raven.Database.Server.HttpServer,Debug,Request #  16: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Profile/ByBookTitle,
+2012-04-18 08:04:13.1884,Raven.Database.Server.HttpServer,Debug,Request #  17: PUT     -     0 ms - BiggerShelf - 201 - /indexes/Profile/ByBookTitle,
+2012-04-18 08:04:13.2074,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 08:04:13.2074,Raven.Database.Server.HttpServer,Debug,Request #  18: GET     -     0 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 08:04:44.0504,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Databases/BiggerShelf' was found,
+2012-04-18 08:04:44.0504,Raven.Database.Server.HttpServer,Debug,Request #  19: GET     -     1 ms - <default>  - 200 - /docs/Raven/Databases/BiggerShelf,
+2012-04-18 08:04:44.1474,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Raven/DocumentsByEntityName for: Tag:Profiles,
+2012-04-18 08:04:44.1484,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'profiles/2' was found,
+2012-04-18 08:04:44.1484,Raven.Database.Server.HttpServer,Debug,Request #  20: GET     -     3 ms - BiggerShelf - 200 - /indexes/dynamic/Profiles?query=&start=0&pageSize=1&aggregation=None,
+2012-04-18 08:04:44.1484,Raven.Database.Server.HttpServer,Debug,"	Query: Tag:Profiles
+	Time: 2 ms
+	Index: Raven/DocumentsByEntityName
+	Results: 1 returned out of 8 total.
+",
+2012-04-18 08:04:44.3094,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 08:04:44.3094,Raven.Database.Server.HttpServer,Debug,Request #  21: GET     -     4 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 08:04:44.3394,Raven.Database.Server.HttpServer,Debug,Request #  22: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Profile/ByBookId,
+2012-04-18 08:04:44.3714,Raven.Database.Server.HttpServer,Debug,Request #  23: PUT     -     0 ms - BiggerShelf - 201 - /indexes/Profile/ByBookId,
+2012-04-18 08:04:44.3714,Raven.Database.Server.HttpServer,Debug,Request #  24: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Book/ByTitle,
+2012-04-18 08:04:44.3824,Raven.Database.Server.HttpServer,Debug,Request #  25: PUT     -     0 ms - BiggerShelf - 201 - /indexes/Book/ByTitle,
+2012-04-18 08:04:44.3824,Raven.Database.Server.HttpServer,Debug,Request #  26: HEAD    -     0 ms - BiggerShelf - 200 - /indexes/Profile/ByBookTitle,
+2012-04-18 08:04:44.3824,Raven.Database.Server.HttpServer,Debug,Request #  27: PUT     -     0 ms - BiggerShelf - 201 - /indexes/Profile/ByBookTitle,
+2012-04-18 08:09:45.5236,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 08:09:45.5236,Raven.Database.Server.HttpServer,Debug,Request #  28: GET     -     0 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 08:25:16.4271,Raven.Database.Indexing.WorkContext,Debug,Stopping background workers,
+2012-04-18 08:52:15.9370,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-04-18 08:52:15.9370,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-04-18 09:03:18.3110,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Databases/BiggerShelf' was found,
+2012-04-18 09:03:18.3770,Raven.Database.Impl.DocumentCacher,Info,"MemoryCache Settings:
+  PhysicalMemoryLimit = 99
+  CacheMemoryLimit    = 3213885440
+  PollingInterval     = 00:02:00",
+2012-04-18 09:03:18.3800,Raven.Storage.Esent.TransactionalStorage,Info,"Esent Settings:
+  MaxVerPages      = 32768
+  CacheSizeMax     = 262144
+  DatabasePageSize = 4096",
+2012-04-18 09:03:18.8790,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Book%2fByTitle:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Book_2fByTitle : AbstractViewGenerator
+{
+	public Index_Book_2fByTitle()
+	{
+		this.ViewText = @""docs.Books
+	.Select(book => new () {Title = book.Title, Id = book.__document_id})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g, (g, book) => new () {Title = book.Title, Id = book.Id})
+
+"";
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Title = book.Title, Id = book.__document_id, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g)), (Func<dynamic, dynamic, dynamic>)((g, book) => new { Title = book.Title, Id = book.Id }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""Title"");
+		this.AddField(""Id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Book_2fByTitle : AbstractViewGenerator
+{
+	public Index_Book_2fByTitle()
+	{
+		this.ViewText = @""docs.Books
+	.Select(book => new () {Title = book.Title, Id = book.__document_id})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g, (g, book) => new () {Title = book.Title, Id = book.Id})
+
+"";
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Title = book.Title, Id = book.__document_id, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g)), (Func<dynamic, dynamic, dynamic>)((g, book) => new { Title = book.Title, Id = book.Id }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""Title"");
+		this.AddField(""Id"");
+	}
+}
+",
+2012-04-18 09:03:18.8790,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Profile%2fByBookId:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookId : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookId()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})
+results
+	.GroupBy(result => new {Id = result.Id, ProfileId = result.ProfileId})
+	.SelectMany(g => g
+	.Where(b => b.Id != null).DefaultIfEmpty(), (g, book) => new {g = g, book = book})
+	.Where(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)
+	.Select(__h__TransparentIdentifier1 => new () {Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title})
+
+results
+	.GroupBy(result => result.Id)
+	.Select(g => new {g = g, book = Database.Load(g.Key)})
+	.Select(__h__TransparentIdentifier2 => new () {Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = book.Title, __document_id = profile.__document_id })));
+		this.TransformResultsDefinition = (Database, results) => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).Select((Func<IGrouping<dynamic,dynamic>, dynamic>)(g => new { g = g, book = Database.Load(g.Key) })).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier2 => new { Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title }));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => new { Id = result.Id, ProfileId = result.ProfileId })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(b => b.Id != null)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, book) => new { g = g, book = book })).Where((Func<dynamic, bool>)(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier1 => new { Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title }));
+		this.GroupByExtraction = result => new { Id = result.Id, ProfileId = result.ProfileId };
+		this.AddField(""Id"");
+		this.AddField(""ProfileId"");
+		this.AddField(""Title"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookId : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookId()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})
+results
+	.GroupBy(result => new {Id = result.Id, ProfileId = result.ProfileId})
+	.SelectMany(g => g
+	.Where(b => b.Id != null).DefaultIfEmpty(), (g, book) => new {g = g, book = book})
+	.Where(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)
+	.Select(__h__TransparentIdentifier1 => new () {Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title})
+
+results
+	.GroupBy(result => result.Id)
+	.Select(g => new {g = g, book = Database.Load(g.Key)})
+	.Select(__h__TransparentIdentifier2 => new () {Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = book.Title, __document_id = profile.__document_id })));
+		this.TransformResultsDefinition = (Database, results) => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).Select((Func<IGrouping<dynamic,dynamic>, dynamic>)(g => new { g = g, book = Database.Load(g.Key) })).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier2 => new { Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title }));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => new { Id = result.Id, ProfileId = result.ProfileId })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(b => b.Id != null)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, book) => new { g = g, book = book })).Where((Func<dynamic, bool>)(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier1 => new { Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title }));
+		this.GroupByExtraction = result => new { Id = result.Id, ProfileId = result.ProfileId };
+		this.AddField(""Id"");
+		this.AddField(""ProfileId"");
+		this.AddField(""Title"");
+	}
+}
+",
+2012-04-18 09:03:18.8790,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Profile%2fByBookTitle:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookTitle : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookTitle()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty})
+docs.Books
+	.Select(book => new () {Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g
+	.Where(p => p.ProfileId != String.Empty).DefaultIfEmpty(), (g, profile) => new {g = g, profile = profile})
+	.SelectMany(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.g
+	.Where(p => p.ProfileId == String.Empty).DefaultIfEmpty(), (__h__TransparentIdentifier1, book) => new () {ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty, __document_id = profile.__document_id })));
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(p => p.ProfileId != String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, profile) => new { g = g, profile = profile })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(__h__TransparentIdentifier1 => (IEnumerable<dynamic>)(__h__TransparentIdentifier1.g.Where((Func<dynamic, bool>)(p => p.ProfileId == String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((__h__TransparentIdentifier1, book) => new { ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""ProfileId"");
+		this.AddField(""Id"");
+		this.AddField(""Title"");
+		this.AddField(""ASIN"");
+		this.AddField(""Author"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookTitle : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookTitle()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty})
+docs.Books
+	.Select(book => new () {Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g
+	.Where(p => p.ProfileId != String.Empty).DefaultIfEmpty(), (g, profile) => new {g = g, profile = profile})
+	.SelectMany(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.g
+	.Where(p => p.ProfileId == String.Empty).DefaultIfEmpty(), (__h__TransparentIdentifier1, book) => new () {ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty, __document_id = profile.__document_id })));
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(p => p.ProfileId != String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, profile) => new { g = g, profile = profile })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(__h__TransparentIdentifier1 => (IEnumerable<dynamic>)(__h__TransparentIdentifier1.g.Where((Func<dynamic, bool>)(p => p.ProfileId == String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((__h__TransparentIdentifier1, book) => new { ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""ProfileId"");
+		this.AddField(""Id"");
+		this.AddField(""Title"");
+		this.AddField(""ASIN"");
+		this.AddField(""Author"");
+	}
+}
+",
+2012-04-18 09:03:18.8790,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Raven%2fDocumentsByEntityName:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 09:03:18.8790,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Book/ByTitle,
+2012-04-18 09:03:18.8790,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Book/ByTitle,
+2012-04-18 09:03:18.8790,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Profile/ByBookId,
+2012-04-18 09:03:18.8790,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Profile/ByBookId, checking the index for errors. This may take a while.",
+2012-04-18 09:03:18.8990,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Profile/ByBookId took: 00:00:00.0103058, clean: True",
+2012-04-18 09:03:18.8990,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_a numSegments=5 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 5: name=_0 docCount=28
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_2.del]
+    test: open reader.........OK [18 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [53 terms; 112 terms/docs pairs; 40 tokens]
+    test: stored fields.......OK [30 total field count; avg 3.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 5: name=_1 docCount=17
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_2.del]
+    test: open reader.........OK [16 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [36 terms; 68 terms/docs pairs; 4 tokens]
+    test: stored fields.......OK [3 total field count; avg 3.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  3 of 5: name=_2 docCount=15
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_2_2.del]
+    test: open reader.........OK [15 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [32 terms; 60 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  4 of 5: name=_3 docCount=14
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_2.del]
+    test: open reader.........OK [14 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [30 terms; 56 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 5: name=_4 docCount=13
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagn",
+2012-04-18 09:03:18.8990,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Profile/ByBookId,
+2012-04-18 09:03:18.8990,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Profile/ByBookTitle,
+2012-04-18 09:03:18.8990,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Profile/ByBookTitle, checking the index for errors. This may take a while.",
+2012-04-18 09:03:18.9170,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Profile/ByBookTitle took: 00:00:00.0117151, clean: True",
+2012-04-18 09:03:18.9170,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_a numSegments=9 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 9: name=_0 docCount=80
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_2.del]
+    test: open reader.........OK [42 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [109 terms; 240 terms/docs pairs; 114 tokens]
+    test: stored fields.......OK [76 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 9: name=_1 docCount=40
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_2.del]
+    test: open reader.........OK [40 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [37 terms; 120 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  3 of 9: name=_2 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 3 tokens]
+    test: stored fields.......OK [2 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  4 of 9: name=_3 docCount=38
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_2.del]
+    test: open reader.........OK [38 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [35 terms; 114 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 9: name=_4 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 3 tokens]
+    test: stored fields.......OK [2 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  6 of 9: name=_5 docCount=34
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_5_2.del]
+    test: open reader.........OK [34 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [33 terms; 102 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  7 of 9: name=_6 docCount=3
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [5 terms; 9 terms/docs pairs; 9 tokens]
+    test: stored fields.......OK [6 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  8 of 9: name=_7 docCount=32
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [31 terms; 96 terms/docs pairs; 96 tokens]
+    test: stored fields.......OK [64 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  9 of 9: name=_8 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pa",
+2012-04-18 09:03:18.9170,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Profile/ByBookTitle,
+2012-04-18 09:03:18.9270,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Raven/DocumentsByEntityName,
+2012-04-18 09:03:18.9270,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Raven/DocumentsByEntityName, checking the index for errors. This may take a while.",
+2012-04-18 09:03:18.9270,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Raven/DocumentsByEntityName took: 00:00:00.0056485, clean: True",
+2012-04-18 09:03:18.9270,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_6 numSegments=5 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 5: name=_0 docCount=60
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [84 terms; 180 terms/docs pairs; 177 tokens]
+    test: stored fields.......OK [59 total field count; avg 1.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 5: name=_1 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  3 of 5: name=_2 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_2_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  4 of 5: name=_3 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 5: name=_4 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Wi",
+2012-04-18 09:03:18.9270,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Raven/DocumentsByEntityName,
+2012-04-18 09:03:18.9270,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Backup/Status' was not found,
+2012-04-18 09:03:18.9440,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 09:03:18.9440,Raven.Database.Server.HttpServer,Debug,Request #  29: GET     -   633 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 09:03:18.9440,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-04-18 09:03:18.9440,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-04-18 09:19:17.1702,Raven.Database.Indexing.WorkContext,Debug,Stopping background workers,
+2012-04-18 09:23:19.3684,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Databases/BiggerShelf' was found,
+2012-04-18 09:23:19.4024,Raven.Database.Impl.DocumentCacher,Info,"MemoryCache Settings:
+  PhysicalMemoryLimit = 99
+  CacheMemoryLimit    = 3213885440
+  PollingInterval     = 00:02:00",
+2012-04-18 09:23:19.4024,Raven.Storage.Esent.TransactionalStorage,Info,"Esent Settings:
+  MaxVerPages      = 32768
+  CacheSizeMax     = 262144
+  DatabasePageSize = 4096",
+2012-04-18 09:23:19.9874,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Book%2fByTitle:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Book_2fByTitle : AbstractViewGenerator
+{
+	public Index_Book_2fByTitle()
+	{
+		this.ViewText = @""docs.Books
+	.Select(book => new () {Title = book.Title, Id = book.__document_id})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g, (g, book) => new () {Title = book.Title, Id = book.Id})
+
+"";
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Title = book.Title, Id = book.__document_id, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g)), (Func<dynamic, dynamic, dynamic>)((g, book) => new { Title = book.Title, Id = book.Id }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""Title"");
+		this.AddField(""Id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Book_2fByTitle : AbstractViewGenerator
+{
+	public Index_Book_2fByTitle()
+	{
+		this.ViewText = @""docs.Books
+	.Select(book => new () {Title = book.Title, Id = book.__document_id})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g, (g, book) => new () {Title = book.Title, Id = book.Id})
+
+"";
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Title = book.Title, Id = book.__document_id, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g)), (Func<dynamic, dynamic, dynamic>)((g, book) => new { Title = book.Title, Id = book.Id }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""Title"");
+		this.AddField(""Id"");
+	}
+}
+",
+2012-04-18 09:23:19.9874,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Profile%2fByBookId:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookId : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookId()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})
+results
+	.GroupBy(result => new {Id = result.Id, ProfileId = result.ProfileId})
+	.SelectMany(g => g
+	.Where(b => b.Id != null).DefaultIfEmpty(), (g, book) => new {g = g, book = book})
+	.Where(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)
+	.Select(__h__TransparentIdentifier1 => new () {Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title})
+
+results
+	.GroupBy(result => result.Id)
+	.Select(g => new {g = g, book = Database.Load(g.Key)})
+	.Select(__h__TransparentIdentifier2 => new () {Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = book.Title, __document_id = profile.__document_id })));
+		this.TransformResultsDefinition = (Database, results) => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).Select((Func<IGrouping<dynamic,dynamic>, dynamic>)(g => new { g = g, book = Database.Load(g.Key) })).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier2 => new { Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title }));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => new { Id = result.Id, ProfileId = result.ProfileId })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(b => b.Id != null)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, book) => new { g = g, book = book })).Where((Func<dynamic, bool>)(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier1 => new { Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title }));
+		this.GroupByExtraction = result => new { Id = result.Id, ProfileId = result.ProfileId };
+		this.AddField(""Id"");
+		this.AddField(""ProfileId"");
+		this.AddField(""Title"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookId : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookId()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = book.Title})
+results
+	.GroupBy(result => new {Id = result.Id, ProfileId = result.ProfileId})
+	.SelectMany(g => g
+	.Where(b => b.Id != null).DefaultIfEmpty(), (g, book) => new {g = g, book = book})
+	.Where(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)
+	.Select(__h__TransparentIdentifier1 => new () {Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title})
+
+results
+	.GroupBy(result => result.Id)
+	.Select(g => new {g = g, book = Database.Load(g.Key)})
+	.Select(__h__TransparentIdentifier2 => new () {Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = book.Title, __document_id = profile.__document_id })));
+		this.TransformResultsDefinition = (Database, results) => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).Select((Func<IGrouping<dynamic,dynamic>, dynamic>)(g => new { g = g, book = Database.Load(g.Key) })).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier2 => new { Id = __h__TransparentIdentifier2.book.Id, ASIN = __h__TransparentIdentifier2.book.ASIN, Author = __h__TransparentIdentifier2.book.Author, Title = __h__TransparentIdentifier2.book.Title }));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => new { Id = result.Id, ProfileId = result.ProfileId })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(b => b.Id != null)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, book) => new { g = g, book = book })).Where((Func<dynamic, bool>)(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.book != null)).Select((Func<dynamic, dynamic>)(__h__TransparentIdentifier1 => new { Id = __h__TransparentIdentifier1.g.Key.Id, ProfileId = __h__TransparentIdentifier1.g.Key.ProfileId, Title = __h__TransparentIdentifier1.book.Title }));
+		this.GroupByExtraction = result => new { Id = result.Id, ProfileId = result.ProfileId };
+		this.AddField(""Id"");
+		this.AddField(""ProfileId"");
+		this.AddField(""Title"");
+	}
+}
+",
+2012-04-18 09:23:19.9874,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Profile%2fByBookTitle:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookTitle : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookTitle()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty})
+docs.Books
+	.Select(book => new () {Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g
+	.Where(p => p.ProfileId != String.Empty).DefaultIfEmpty(), (g, profile) => new {g = g, profile = profile})
+	.SelectMany(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.g
+	.Where(p => p.ProfileId == String.Empty).DefaultIfEmpty(), (__h__TransparentIdentifier1, book) => new () {ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty, __document_id = profile.__document_id })));
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(p => p.ProfileId != String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, profile) => new { g = g, profile = profile })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(__h__TransparentIdentifier1 => (IEnumerable<dynamic>)(__h__TransparentIdentifier1.g.Where((Func<dynamic, bool>)(p => p.ProfileId == String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((__h__TransparentIdentifier1, book) => new { ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""ProfileId"");
+		this.AddField(""Id"");
+		this.AddField(""Title"");
+		this.AddField(""ASIN"");
+		this.AddField(""Author"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Profile_2fByBookTitle : AbstractViewGenerator
+{
+	public Index_Profile_2fByBookTitle()
+	{
+		this.ViewText = @""docs.Profiles
+	.SelectMany(profile => profile.ReadingList, (profile, book) => new () {Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty})
+docs.Books
+	.Select(book => new () {Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+results
+	.GroupBy(result => result.Id)
+	.SelectMany(g => g
+	.Where(p => p.ProfileId != String.Empty).DefaultIfEmpty(), (g, profile) => new {g = g, profile = profile})
+	.SelectMany(__h__TransparentIdentifier1 => __h__TransparentIdentifier1.g
+	.Where(p => p.ProfileId == String.Empty).DefaultIfEmpty(), (__h__TransparentIdentifier1, book) => new () {ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author})
+
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Profiles"").SelectMany((Func<dynamic, IEnumerable<dynamic>>)(profile => (IEnumerable<dynamic>)(profile.ReadingList)), (Func<dynamic, dynamic, dynamic>)((profile, book) => new { Id = book.Id, ProfileId = profile.__document_id, Title = String.Empty, ASIN = String.Empty, Author = String.Empty, __document_id = profile.__document_id })));
+		this.ForEntityNames.Add(""Books"");
+		this.AddMapDefinition(docs => docs.Where(__document => __document[""@metadata""][""Raven-Entity-Name""] == ""Books"").Select((Func<dynamic, dynamic>)(book => new { Id = book.__document_id, ProfileId = String.Empty, Title = book.Title, ASIN = book.ASIN, Author = book.Author, __document_id = book.__document_id })));
+		this.ReduceDefinition = results => results.GroupBy((Func<dynamic, dynamic>)(result => result.Id)).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(g => (IEnumerable<dynamic>)(g.Where((Func<dynamic, bool>)(p => p.ProfileId != String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((g, profile) => new { g = g, profile = profile })).SelectMany((Func<dynamic, IEnumerable<dynamic>>)(__h__TransparentIdentifier1 => (IEnumerable<dynamic>)(__h__TransparentIdentifier1.g.Where((Func<dynamic, bool>)(p => p.ProfileId == String.Empty)).DefaultIfEmpty())), (Func<dynamic, dynamic, dynamic>)((__h__TransparentIdentifier1, book) => new { ProfileId = __h__TransparentIdentifier1.profile.ProfileId, Id = __h__TransparentIdentifier1.g.Key, Title = book.Title, ASIN = book.ASIN, Author = book.Author }));
+		this.GroupByExtraction = result => result.Id;
+		this.AddField(""ProfileId"");
+		this.AddField(""Id"");
+		this.AddField(""Title"");
+		this.AddField(""ASIN"");
+		this.AddField(""Author"");
+	}
+}
+",
+2012-04-18 09:23:19.9874,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Raven%2fDocumentsByEntityName:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Raven_2fDocumentsByEntityName : AbstractViewGenerator
+{
+	public Index_Raven_2fDocumentsByEntityName()
+	{
+		this.ViewText = @""from doc in docs 
+let Tag = doc[""""@metadata""""][""""Raven-Entity-Name""""]
+select new { Tag, LastModified = (DateTime)doc[""""@metadata""""][""""Last-Modified""""] };
+"";
+		this.AddMapDefinition(docs => from doc in docs
+			let Tag = doc[""@metadata""][""Raven-Entity-Name""]
+			select new { Tag, LastModified = (DateTime)doc[""@metadata""][""Last-Modified""], __document_id = doc.__document_id });
+		this.AddField(""LastModified"");
+		this.AddField(""__document_id"");
+		this.AddField(""Tag"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 09:23:19.9874,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Book/ByTitle,
+2012-04-18 09:23:19.9874,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Book/ByTitle,
+2012-04-18 09:23:19.9874,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Profile/ByBookId,
+2012-04-18 09:23:19.9874,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Profile/ByBookId, checking the index for errors. This may take a while.",
+2012-04-18 09:23:20.0074,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Profile/ByBookId took: 00:00:00.0053365, clean: True",
+2012-04-18 09:23:20.0074,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_a numSegments=5 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 5: name=_0 docCount=28
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_2.del]
+    test: open reader.........OK [18 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [53 terms; 112 terms/docs pairs; 40 tokens]
+    test: stored fields.......OK [30 total field count; avg 3.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 5: name=_1 docCount=17
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_2.del]
+    test: open reader.........OK [16 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [36 terms; 68 terms/docs pairs; 4 tokens]
+    test: stored fields.......OK [3 total field count; avg 3.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  3 of 5: name=_2 docCount=15
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_2_2.del]
+    test: open reader.........OK [15 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [32 terms; 60 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  4 of 5: name=_3 docCount=14
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_2.del]
+    test: open reader.........OK [14 deleted docs]
+    test: fields..............OK [4 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [30 terms; 56 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 5: name=_4 docCount=13
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagn",
+2012-04-18 09:23:20.0074,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Profile/ByBookId,
+2012-04-18 09:23:20.0074,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Profile/ByBookTitle,
+2012-04-18 09:23:20.0074,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Profile/ByBookTitle, checking the index for errors. This may take a while.",
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Profile/ByBookTitle took: 00:00:00.0063470, clean: True",
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_a numSegments=9 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 9: name=_0 docCount=80
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_2.del]
+    test: open reader.........OK [42 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [109 terms; 240 terms/docs pairs; 114 tokens]
+    test: stored fields.......OK [76 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 9: name=_1 docCount=40
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_2.del]
+    test: open reader.........OK [40 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [37 terms; 120 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  3 of 9: name=_2 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 3 tokens]
+    test: stored fields.......OK [2 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  4 of 9: name=_3 docCount=38
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_2.del]
+    test: open reader.........OK [38 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [35 terms; 114 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 9: name=_4 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 3 tokens]
+    test: stored fields.......OK [2 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  6 of 9: name=_5 docCount=34
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_5_2.del]
+    test: open reader.........OK [34 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [33 terms; 102 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  7 of 9: name=_6 docCount=3
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [5 terms; 9 terms/docs pairs; 9 tokens]
+    test: stored fields.......OK [6 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  8 of 9: name=_7 docCount=32
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [31 terms; 96 terms/docs pairs; 96 tokens]
+    test: stored fields.......OK [64 total field count; avg 2.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  9 of 9: name=_8 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    no deletions
+    test: open reader.........OK
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pa",
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Profile/ByBookTitle,
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.IndexStorage.Startup,Debug,Loading saved index Raven/DocumentsByEntityName,
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Unclean shutdown detected on Raven/DocumentsByEntityName, checking the index for errors. This may take a while.",
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.IndexStorage.Startup,Warn,"Checking index Raven/DocumentsByEntityName took: 00:00:00.0044229, clean: True",
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.IndexStorage,Warn,"Segments file=segments_6 numSegments=5 version=FORMAT_DIAGNOSTICS [Lucene 2.9]
+  1 of 5: name=_0 docCount=60
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_0_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [84 terms; 180 terms/docs pairs; 177 tokens]
+    test: stored fields.......OK [59 total field count; avg 1.00 fields per doc]
+    test: term vectors........OK [0 total vector count; avg 0.00 term/freq vector fields per doc]
+
+  2 of 5: name=_1 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_1_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  3 of 5: name=_2 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_2_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  4 of 5: name=_3 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=2
+    size (MB)=0.00
+    diagnostics = {os=Windows_NT, lucene.version=2.9.4.1, source=flush, os.arch=AMD64, os.version=Microsoft Windows NT 6.1.7601 Service Pack 1, java.version=, java.vendor=}
+    has deletions [delFileName=_3_1.del]
+    test: open reader.........OK [1 deleted docs]
+    test: fields..............OK [3 fields]
+    test: field norms.........OK [0 fields]
+    test: terms, freq, prox...OK [3 terms; 3 terms/docs pairs; 0 tokens]
+    test: stored fields.......OK [0 total field count; avg NaN fields per doc]
+    test: term vectors........OK [0 total vector count; avg NaN term/freq vector fields per doc]
+
+  5 of 5: name=_4 docCount=1
+    compound=True
+    hasProx=True
+    numFiles=1
+    size (MB)=0.00
+    diagnostics = {os=Wi",
+2012-04-18 09:23:20.0184,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Raven/DocumentsByEntityName,
+2012-04-18 09:23:20.4815,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Backup/Status' was not found,
+2012-04-18 09:23:20.4815,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 09:23:20.4815,Raven.Database.Server.HttpServer,Debug,"Request #  30: GET     - 1,117 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations",
+2012-04-18 09:23:20.4875,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-04-18 09:23:20.4875,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-04-18 09:30:31.8706,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 09:30:31.8706,Raven.Database.Server.HttpServer,Debug,Request #  31: GET     -     0 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 09:36:03.7158,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 09:36:03.7158,Raven.Database.Server.HttpServer,Debug,Request #  32: GET     -     1 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 09:41:39.9908,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 09:41:39.9908,Raven.Database.Server.HttpServer,Debug,Request #  33: GET     -     0 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 09:47:11.4536,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 09:47:11.4536,Raven.Database.Server.HttpServer,Debug,Request #  34: GET     -     0 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 09:52:15.9750,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-04-18 09:52:15.9750,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-04-18 10:00:31.5930,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-04-18 10:00:31.5930,Raven.Database.Server.HttpServer,Debug,Request #  35: GET     -     0 ms - BiggerShelf - 404 - /docs/Raven/Replication/Destinations,
+2012-04-18 10:01:20.4390,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Temp%2fProfiles%2fByEmail:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByEmail : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByEmail()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { Email = doc.Email }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { Email = doc.Email, __document_id = doc.__document_id });
+		this.AddField(""Email"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""Email"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""Email"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByEmail : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByEmail()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { Email = doc.Email }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { Email = doc.Email, __document_id = doc.__document_id });
+		this.AddField(""Email"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""Email"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""Email"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 10:01:20.4640,Raven.Database.Indexing.IndexStorage,Info,Creating index Temp/Profiles/ByEmail with encoded name Temp/Profiles/ByEmail,
+2012-04-18 10:01:20.4640,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Temp/Profiles/ByEmail,
+2012-04-18 10:01:20.4830,Raven.Database.Indexing.WorkContext,Debug,Incremented work counter to 1 because: PUT INDEX Temp/Profiles/ByEmail,
+2012-04-18 10:01:20.4830,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:20.4830,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 1, for: ReducingExecuter, will wait for additional work",
+2012-04-18 10:01:20.5900,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,Found a total of 62 documents that requires indexing since etag: 00000000-0000-0000-0000-000000000000,
+2012-04-18 10:01:20.6010,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:20.6800,Raven.Database.Impl.DocumentRetriever,Debug,Triggered Raven.Database.Plugins.Builtins.FilterRavenInternalDocumentsReadTrigger asked us to ignore Raven/Hilo/profiles,
+2012-04-18 10:01:20.6800,Raven.Database.Impl.DocumentRetriever,Debug,Triggered Raven.Database.Plugins.Builtins.FilterRavenInternalDocumentsReadTrigger asked us to ignore Raven/Hilo/books,
+2012-04-18 10:01:20.6800,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,"After read triggers executed, 60 documents remained",
+2012-04-18 10:01:20.6990,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,"Going to index 8 documents in IndexName: Temp/Profiles/ByEmail, LastIndexedEtag: 00000000-0000-0000-0000-000000000000",
+2012-04-18 10:01:20.6990,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,"Indexing 8 documents for index: Temp/Profiles/ByEmail. (profiles/2,profiles/3,profiles/4,profiles/5,profiles/6,profiles/7,profiles/8,profiles/1)",
+2012-04-18 10:01:20.6990,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:20.8060,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:20.9070,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:20.9340,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/2 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/2
+	Email I-: deepm@microsoft.com
+",
+2012-04-18 10:01:21.0070,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:21.0240,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/3 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/3
+	Email I-: jeffhand@microsoft.com
+",
+2012-04-18 10:01:21.0240,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/4 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/4
+	Email I-: yavorg@microsoft.com
+",
+2012-04-18 10:01:21.0240,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/5 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/5
+	Email I-: howard@microsoft.com
+",
+2012-04-18 10:01:21.0240,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/6 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/6
+	Email I-: gblock@microsoft.com
+",
+2012-04-18 10:01:21.0240,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/7 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/7
+	Email I-: joconnol@microsoft.com
+",
+2012-04-18 10:01:21.0240,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/8 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/8
+	Email I-: brado@microsoft.com
+",
+2012-04-18 10:01:21.0240,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/1 result in index Temp/Profiles/ByEmail gave document: 	__document_id IS: profiles/1
+	Email I-: demo@microsoft.com
+",
+2012-04-18 10:01:21.1070,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:21.1820,Raven.Database.Indexing.Index.Indexing,Debug,Indexed 24 documents for Temp/Profiles/ByEmail,
+2012-04-18 10:01:21.1930,Raven.Database.Indexing.WorkContext,Debug,Incremented work counter to 2 because: WORK BY IndexingExecuter,
+2012-04-18 10:01:21.1930,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 2, for: IndexingExecuter, will wait for additional work",
+2012-04-18 10:01:21.2060,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 2, for: ReducingExecuter, will wait for additional work",
+2012-04-18 10:01:21.2060,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByEmail for: Email:demo@microsoft.com,
+2012-04-18 10:01:21.2060,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'profiles/1' was found,
+2012-04-18 10:01:21.2060,Raven.Database.Server.HttpServer,Debug,Request #  36: GET     -   796 ms - BiggerShelf - 200 - /indexes/dynamic/Profiles?query=Email%253Ademo%2540microsoft.com&start=0&pageSize=1&aggregation=None,
+2012-04-18 10:01:21.2060,Raven.Database.Server.HttpServer,Debug,"	Query: Email:demo@microsoft.com
+	Time: 796 ms
+	Index: Temp/Profiles/ByEmail
+	Results: 1 returned out of 1 total.
+",
+2012-04-18 10:01:21.2290,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Temp%2fProfiles%2fByAspNetUserGuid:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByAspNetUserGuid : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByAspNetUserGuid()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { AspNetUserGuid = doc.AspNetUserGuid }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { AspNetUserGuid = doc.AspNetUserGuid, __document_id = doc.__document_id });
+		this.AddField(""AspNetUserGuid"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""AspNetUserGuid"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""AspNetUserGuid"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fProfiles_2fByAspNetUserGuid : AbstractViewGenerator
+{
+	public Index_Temp_2fProfiles_2fByAspNetUserGuid()
+	{
+		this.ViewText = @""from doc in docs.Profiles
+select new { AspNetUserGuid = doc.AspNetUserGuid }
+"";
+		this.ForEntityNames.Add(""Profiles"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""Profiles""
+			select new { AspNetUserGuid = doc.AspNetUserGuid, __document_id = doc.__document_id });
+		this.AddField(""AspNetUserGuid"");
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""AspNetUserGuid"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""AspNetUserGuid"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-04-18 10:01:21.2290,Raven.Database.Indexing.IndexStorage,Info,Creating index Temp/Profiles/ByAspNetUserGuid with encoded name Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 10:01:21.2290,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 10:01:21.2290,Raven.Database.Indexing.WorkContext,Debug,Incremented work counter to 3 because: PUT INDEX Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 10:01:21.2290,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByAspNetUserGuid for: AspNetUserGuid:3730F12D\-1A2A\-4499\-859B\-9F586B2858A4,
+2012-04-18 10:01:21.2430,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 3, for: ReducingExecuter, will wait for additional work",
+2012-04-18 10:01:21.2430,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,Found a total of 62 documents that requires indexing since etag: 00000000-0000-0000-0000-000000000000,
+2012-04-18 10:01:21.2430,Raven.Database.Impl.DocumentRetriever,Debug,Triggered Raven.Database.Plugins.Builtins.FilterRavenInternalDocumentsReadTrigger asked us to ignore Raven/Hilo/profiles,
+2012-04-18 10:01:21.2430,Raven.Database.Impl.DocumentRetriever,Debug,Triggered Raven.Database.Plugins.Builtins.FilterRavenInternalDocumentsReadTrigger asked us to ignore Raven/Hilo/books,
+2012-04-18 10:01:21.2430,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,"After read triggers executed, 60 documents remained",
+2012-04-18 10:01:21.2430,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,"Going to index 8 documents in IndexName: Temp/Profiles/ByAspNetUserGuid, LastIndexedEtag: 00000000-0000-0000-0000-000000000000",
+2012-04-18 10:01:21.2430,Raven.Database.Indexing.AbstractIndexingExecuter,Debug,"Indexing 8 documents for index: Temp/Profiles/ByAspNetUserGuid. (profiles/2,profiles/3,profiles/4,profiles/5,profiles/6,profiles/7,profiles/8,profiles/1)",
+2012-04-18 10:01:21.2570,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/2 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/2
+	AspNetUserGuid I-: 5ad7976c-7a95-47aa-87ba-29c3fc80643e
+",
+2012-04-18 10:01:21.2570,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/3 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/3
+	AspNetUserGuid I-: 9330619d-9a8c-4269-9bde-ba4cb1b7b354
+",
+2012-04-18 10:01:21.2570,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/4 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/4
+	AspNetUserGuid I-: 1a481f1e-1b22-4ae3-a75d-d5fa664d4085
+",
+2012-04-18 10:01:21.2570,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/5 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/5
+	AspNetUserGuid I-: 5df20314-4c44-44ad-9847-143f28f85bf5
+",
+2012-04-18 10:01:21.2720,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/6 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/6
+	AspNetUserGuid I-: 990c62c5-30a4-4ca9-92c5-f248241f6d44
+",
+2012-04-18 10:01:21.2720,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/7 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/7
+	AspNetUserGuid I-: 3e82b681-81ce-4c87-856a-61381d4ad0e8
+",
+2012-04-18 10:01:21.2720,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/8 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/8
+	AspNetUserGuid I-: 9fc20e29-91b1-47c0-8054-5624ac87c5d8
+",
+2012-04-18 10:01:21.2720,Raven.Database.Indexing.Index.Indexing,Debug,"Indexing on profiles/1 result in index Temp/Profiles/ByAspNetUserGuid gave document: 	__document_id IS: profiles/1
+	AspNetUserGuid I-: 3730F12D-1A2A-4499-859B-9F586B2858A4
+",
+2012-04-18 10:01:21.2720,Raven.Database.Indexing.Index.Indexing,Debug,Indexed 24 documents for Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 10:01:21.2720,Raven.Database.Indexing.WorkContext,Debug,Incremented work counter to 4 because: WORK BY IndexingExecuter,
+2012-04-18 10:01:21.2720,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 4, for: IndexingExecuter, will wait for additional work",
+2012-04-18 10:01:21.2850,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 4, for: ReducingExecuter, will wait for additional work",
+2012-04-18 10:01:21.3360,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/Profiles/ByAspNetUserGuid for: AspNetUserGuid:3730F12D\-1A2A\-4499\-859B\-9F586B2858A4,
+2012-04-18 10:01:21.3360,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'profiles/1' was found,
+2012-04-18 10:01:21.3360,Raven.Database.Server.HttpServer,Debug,Request #  37: GET     -   113 ms - BiggerShelf - 200 - /indexes/dynamic/Profiles?query=AspNetUserGuid%253A3730F12D%255C-1A2A%255C-4499%255C-859B%255C-9F586B2858A4&start=0&pageSize=2&aggregation=None,
+2012-04-18 10:01:21.3360,Raven.Database.Server.HttpServer,Debug,"	Query: AspNetUserGuid:3730F12D\-1A2A\-4499\-859B\-9F586B2858A4
+	Time: 112 ms
+	Index: Temp/Profiles/ByAspNetUserGuid
+	Results: 1 returned out of 1 total.
+",
+2012-04-18 10:01:23.2950,Raven.Database.Server.HttpServer,Debug,Request #  38: GET     -     1 ms - BiggerShelf - 304 - /indexes/dynamic/Profiles?query=AspNetUserGuid%253A3730F12D%255C-1A2A%255C-4499%255C-859B%255C-9F586B2858A4&start=0&pageSize=2&aggregation=None,
+2012-04-18 10:01:23.2950,Raven.Database.Server.HttpServer,Debug,"	Query: AspNetUserGuid:3730F12D\-1A2A\-4499\-859B\-9F586B2858A4
+	Time: 1 ms
+",
+2012-04-18 10:01:23.7420,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Raven/DocumentsByEntityName for: Tag:Books,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/1' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/2' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/3' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/4' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/5' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/6' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/7' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/8' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/9' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/10' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/11' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/12' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/13' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/14' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/15' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/16' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/17' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/18' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/19' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/20' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/21' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/22' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/23' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/24' was found,
+2012-04-18 10:01:23.7420,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/25' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/26' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/27' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/28' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/29' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/30' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/31' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/32' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/33' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/34' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/35' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/36' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/37' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/38' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/39' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/40' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/41' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/42' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/43' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/44' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/45' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/46' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/47' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/48' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/49' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/50' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/51' was found,
+2012-04-18 10:01:23.7490,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'books/52' was found,
+2012-04-18 10:01:23.7700,Raven.Database.Server.HttpServer,Debug,Request #  39: GET     -    28 ms - BiggerShelf - 200 - /indexes/dynamic/Books?query=&start=0&pageSize=128&aggregation=None,
+2012-04-18 10:01:23.7700,Raven.Database.Server.HttpServer,Debug,"	Query: Tag:Books
+	Time: 11 ms
+	Index: Raven/DocumentsByEntityName
+	Results: 52 returned out of 52 total.
+",
+2012-04-18 10:17:17.9482,Raven.Database.Indexing.WorkContext,Debug,Stopping background workers,
+2012-04-18 10:22:15.6930,Raven.Database.Indexing.IndexStorage,Info,Deleting index Temp/Profiles/ByAspNetUserGuid,
+2012-04-18 10:22:16.3251,Raven.Database.Indexing.DefaultBackgroundTaskExecuter,Error,Could not execute repeated task,"System.NullReferenceException: Object reference not set to an instance of an object.
+   at Raven.Database.Indexing.IndexSearcherHolder.IndexSearcherHoldingState.DisposeRudely() in c:\Builds\RavenDB-Stable\Raven.Database\Indexing\IndexSearcherHolder.cs:line 73
+   at Raven.Database.Indexing.IndexSearcherHolder.IndexSearcherHoldingState.Dispose() in c:\Builds\RavenDB-Stable\Raven.Database\Indexing\IndexSearcherHolder.cs:line 68
+   at Raven.Database.Indexing.IndexSearcherHolder.SetIndexSearcher(IndexSearcher searcher) in c:\Builds\RavenDB-Stable\Raven.Database\Indexing\IndexSearcherHolder.cs:line 25
+   at Raven.Database.Indexing.Index.Dispose() in c:\Builds\RavenDB-Stable\Raven.Database\Indexing\Index.cs:line 98
+   at Raven.Database.Indexing.IndexStorage.DeleteIndex(String name) in c:\Builds\RavenDB-Stable\Raven.Database\Indexing\IndexStorage.cs:line 259
+   at Raven.Database.DocumentDatabase.DeleteIndex(String name) in c:\Builds\RavenDB-Stable\Raven.Database\DocumentDatabase.cs:line 871
+   at Raven.Database.Queries.DynamicQueryRunner.CleanupCache() in c:\Builds\RavenDB-Stable\Raven.Database\Queries\DynamicQueryRunner.cs:line 130
+   at Raven.Database.Plugins.Builtins.CleanupOldDynamicIndexes.Execute() in c:\Builds\RavenDB-Stable\Raven.Database\Plugins\Builtins\CleanupOldDynamicIndexes.cs:line 43
+   at Raven.Database.Indexing.DefaultBackgroundTaskExecuter.ExecuteTimer(Object state) in c:\Builds\RavenDB-Stable\Raven.Database\Indexing\DefaultBackgroundTaskExecuter.cs:line 61"
