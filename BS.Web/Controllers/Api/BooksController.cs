@@ -10,9 +10,9 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
             return Docs.Query<Book>();
         }
 
-        //public Book Get(int id)
-        //{
-        //    return Docs.Load<Book>("books/" + id);
-        //}
+        public Book Get(int id)
+        {
+            return Docs.Load<Book>("books/" + id);
+        }
     }
 }

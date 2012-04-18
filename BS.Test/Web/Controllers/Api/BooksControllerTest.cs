@@ -1,36 +1,60 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Kaiser.BiggerShelf.Web.Controllers.Api;
 using Kaiser.BiggerShelf.Web.Models;
-using Raven.Client.Embedded;
 using Xunit;
 
 namespace Kaiser.BiggerShelf.Test.Web.Controllers.Api
 {
-    public class BooksControllerTest
+    public class BooksControllerTest : IControllerTest
     {
         [Fact]
-        public void ReturnsAllBooksOnGet()
+        public void GetAllBooks()
         {
-            using (var store = new EmbeddableDocumentStore{RunInMemory = true})
+            this.ExecuteAction<BooksController>(
+                dbObjects: new object[] {new Book {Title = "A Book"}},
+                action: controller =>
+                            {
+                                var books = controller.Get();
+
+                                Assert.Equal(1, books.Count());
+                                Assert.Equal("A Book", books.Single().Title);
+                            }
+                );
+        }
+
+        [Fact]
+        public void MaximumOf128BooksReturned()
+        {
+            var existingBooks = new List<Book>();
+            for (var i = 0; i < 129; i++)
             {
-                store.Initialize();
-                using (var session = store.OpenSession())
-                {
-                    session.Store(new Book {Title = "A Book"});
-                    session.SaveChanges();
-                }
-
-
-                using (var session = store.OpenSession())
-                {
-                    var controller = new BooksController {Docs = session};
-                    var books = controller.Get();
-
-                    Assert.Equal(1, books.Count());
-                    Assert.Equal("A Book", books.Single().Title);
-                }
+                existingBooks.Add(new Book {Title = "Book #" + i});
             }
-            
+
+            this.ExecuteAction<BooksController>(
+                dbObjects: existingBooks.ToArray(),
+                action: controller =>
+                            {
+                                var books = controller.Get();
+
+                                Assert.Equal(128, books.ToList().Count());
+                            }
+                );
+        }
+
+        [Fact]
+        public void GetSingleBook()
+        {
+            this.ExecuteAction<BooksController>(
+                dbObjects: new object[] {new Book {Title = "A Book"}},
+                action: controller =>
+                            {
+                                var book = controller.Get(1);
+
+                                Assert.Equal("A Book", book.Title);
+                            }
+                );
         }
     }
 }

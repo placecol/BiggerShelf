@@ -92,6 +92,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="xunit">
       <HintPath>..\packages\xunit.1.9.0.1566\lib\xunit.dll</HintPath>
@@ -103,8 +105,13 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControllerTestExtensions.cs" />
+    <Compile Include="IControllerTest.cs" />
+    <Compile Include="IRavenTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RavenTestExtentions.cs" />
     <Compile Include="Web\Controllers\Api\BooksControllerTest.cs" />
+    <Compile Include="Web\Controllers\Api\ProfilesControllerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -80,13 +80,13 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
 
         public IQueryable<SelectedBook> GetReadingList(int id)
         {
-            var profile = Docs.Load<Profile>("profiles" + id);
+            var profile = Docs.Load<Profile>("profiles/" + id);
             return profile.ReadingList.AsQueryable();
         }
 
         public HttpResponseMessage<SelectedBook> GetBookFromReadingList(int id, int bookId)
         {
-            var profile = Docs.Load<Profile>("profiles" + id);
+            var profile = Docs.Load<Profile>("profiles/" + id);
             if (profile == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
 
             return new HttpResponseMessage<SelectedBook>(profile.ReadingList.SingleOrDefault(b => b.Id == "books" + bookId));
