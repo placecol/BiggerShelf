@@ -6,12 +6,12 @@ using Xunit;
 
 namespace Kaiser.BiggerShelf.Test.Web.Controllers.Api
 {
-    public class BooksControllerTest : IControllerTest
+    public class BooksControllerTest
     {
         [Fact]
         public void GetAllBooks()
         {
-            this.ExecuteAction<BooksController>(
+            Exec.Action<BooksController>(
                 dbObjects: new object[] {new Book {Title = "A Book"}},
                 action: controller =>
                             {
@@ -32,7 +32,7 @@ namespace Kaiser.BiggerShelf.Test.Web.Controllers.Api
                 existingBooks.Add(new Book {Title = "Book #" + i});
             }
 
-            this.ExecuteAction<BooksController>(
+            Exec.Action<BooksController>(
                 dbObjects: existingBooks.ToArray(),
                 action: controller =>
                             {
@@ -46,7 +46,7 @@ namespace Kaiser.BiggerShelf.Test.Web.Controllers.Api
         [Fact]
         public void GetSingleBook()
         {
-            this.ExecuteAction<BooksController>(
+            Exec.Action<BooksController>(
                 dbObjects: new object[] {new Book {Title = "A Book"}},
                 action: controller =>
                             {

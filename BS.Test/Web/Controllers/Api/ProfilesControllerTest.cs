@@ -7,12 +7,12 @@ using Xunit;
 
 namespace Kaiser.BiggerShelf.Test.Web.Controllers.Api
 {
-    public class ProfilesControllerTest : IControllerTest
+    public class ProfilesControllerTest
     {
         [Fact]
         public void GetProfileOtherThanYourOwnIsForbidden()
         {
-            this.ExecuteAction<ProfilesController>(
+            Exec.Action<ProfilesController>(
                 dbObjects: new object[]
                                {
                                    new Profile {Id = "profiles/1", AspNetUserGuid = "me"},
@@ -30,7 +30,7 @@ namespace Kaiser.BiggerShelf.Test.Web.Controllers.Api
         [Fact]
         public void GetProfileForCurrentUser()
         {
-            this.ExecuteAction<ProfilesController>(
+            Exec.Action<ProfilesController>(
                 dbObjects: new object[]
                                {
                                    new Profile {Id = "profiles/1", AspNetUserGuid = "me"},
@@ -48,7 +48,7 @@ namespace Kaiser.BiggerShelf.Test.Web.Controllers.Api
         [Fact]
         public void GetProfilesReadingList()
         {
-            this.ExecuteAction<ProfilesController>(
+            Exec.Action<ProfilesController>(
                 dbObjects: new object[]
                                {
                                    new Profile

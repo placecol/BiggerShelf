@@ -105,11 +105,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ControllerTestExtensions.cs" />
-    <Compile Include="IControllerTest.cs" />
-    <Compile Include="IRavenTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RavenTestExtentions.cs" />
+    <Compile Include="Exec.cs" />
     <Compile Include="Web\Controllers\Api\BooksControllerTest.cs" />
     <Compile Include="Web\Controllers\Api\ProfilesControllerTest.cs" />
   </ItemGroup>
