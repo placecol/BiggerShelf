@@ -219,8 +219,12 @@
     <Content Include="Scripts\knockout.mapping-latest.js" />
     <Content Include="Scripts\modernizr-2.0.6-development-only.js" />
     <Content Include="Scripts\qunit.js" />
+    <Content Include="Scripts\sinon-1.3.4.js" />
+    <Content Include="Scripts\sinon-qunit-1.0.0.js" />
+    <Content Include="Scripts\Test\Book_Test.js" />
     <Content Include="Scripts\Test\CatalogViewModel_Test.js" />
     <Content Include="Scripts\Test\Profile_Test.js" />
+    <Content Include="Scripts\Test\TestData.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Test.htm" />
     <Content Include="Web.config" />

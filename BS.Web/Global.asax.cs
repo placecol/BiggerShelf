@@ -58,10 +58,10 @@ namespace Kaiser.BiggerShelf.Web
             routes.MapHttpRoute("GetBookFromReadingList", "api/profiles/{id}/books/{bookId}",
                                 new {controller = "Profiles", action = "GetBookFromReadingList"},
                                 new {httpMethod = new HttpMethodConstraint(new[] {"GET"})});
-            routes.MapHttpRoute("AddBookToReadingList", "api/profiles/{id}/books",
+            routes.MapHttpRoute("AddBookToReadingList", "api/profiles/{id}/books/{bookId}",
                                 new {controller = "Profiles", action = "AddBookToReadingList"},
                                 new {httpMethod = new HttpMethodConstraint(new[] {"POST"})});
-            routes.MapHttpRoute("UpdateBookRating", "api/profiles/{id}/books/{bookId}/rating/{rating}",
+            routes.MapHttpRoute("UpdateBookRating", "api/profiles/{id}/books/{bookId}",
                                 new {controller = "Profiles", action = "UpdateBookRating"},
                                 new {httpMethod = new HttpMethodConstraint(new[] {"PUT"})});
             routes.MapHttpRoute("RemoveBookFromReadingList", "api/profiles/{id}/books/{bookId}",

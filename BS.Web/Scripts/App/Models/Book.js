@@ -9,6 +9,7 @@
         ko.mapping.fromJS(data, {}, self);
 
         self.profile = profile;
+
         self.isSelected = ko.computed({
             read: function () {
                 return self.profile.isBookOnReadingList(self.Id);
@@ -19,6 +20,19 @@
                 } else {
                     self.profile.removeBookFromReadingList(self.Id);
                 }
+            }
+        });
+
+        self.UserRating = ko.computed({
+            read: function () {
+                if (self.isSelected()) {
+                    return self.profile.getBookFromReadingList(self.Id).Rating();
+                } else {
+                    return 0;
+                }
+            },
+            write: function (val) {
+                self.profile.addBookToReadingList(self.Id, val);
             }
         });
     }

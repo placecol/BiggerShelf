@@ -6,6 +6,16 @@
 
 <div data-bind="with: profile">
     <h2>Books for <span data-bind="text: Email"></span></h2>
+    <table>
+        <thead><tr><th>Id</th><th>Title</th><th>My Rating</th></tr></thead>
+        <tbody data-bind="foreach: ReadingList">
+            <tr>
+                <td data-bind="text: Id" ></td>
+                <td data-bind="text: Title" ></td>
+                <td data-bind="text: Rating"></td>
+            </tr>
+        </tbody>
+    </table>
     <ul data-bind="foreach: ReadingList">
         <li data-bind="text: Id"></li>
     </ul>
@@ -14,12 +24,13 @@
 
 <h2>All Books</h2>
 <table>
-    <thead><tr><th>Title</th><th>Author</th><th>Selected</th></tr></thead>
+    <thead><tr><th>Title</th><th>Author</th><th>Selected</th><th>Rating</th></tr></thead>
     <tbody data-bind="foreach: books">
         <tr>
             <td data-bind="text: Title" ></td>
             <td data-bind="text: Author" ></td>
             <td><input type="checkbox" data-bind="checked: isSelected" /></td>
+            <td data-bind="text: UserRating"></td>
         </tr>
     </tbody>
 </table>

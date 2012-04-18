@@ -94,9 +94,6 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
 
         public HttpResponseMessage UpdateBookRating(int id, int bookId, int rating)
         {
-            // make sure rating is from 0 - 5
-            rating = rating < 0 ? 0 : rating > 5 ? 5 : rating;
-
             var profile = Docs.Load<Profile>("profiles/" + id);
             if (profile == null) return new HttpResponseMessage(HttpStatusCode.NotFound);
 
@@ -105,31 +102,36 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
             if (selectedBook == null)
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
 
-            selectedBook.Rating = rating;
+            selectedBook.Rating = NormalizeRating(rating);
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
-        public HttpResponseMessage<SelectedBook> AddBookToReadingList(int id, SelectedBook bookToAdd)
+        public HttpResponseMessage<SelectedBook> AddBookToReadingList(int id, int bookId, int rating = 0)
         {
             var profile = Docs.Load<Profile>("profiles/" + id);
             if (profile == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
 
-            var book = Docs.Load<Book>(bookToAdd.Id);
+            var book = Docs.Load<Book>("books/" + bookId);
             if (book == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
 
-            var selectedBook = profile.ReadingList.SingleOrDefault(b => b.Id == bookToAdd.Id);
+            var selectedBook = profile.ReadingList.SingleOrDefault(b => b.Id == "books/" + bookId);
             if (selectedBook == null)
             {
                 selectedBook = new SelectedBook
                                    {
                                        Id = book.Id,
                                        Title = book.Title,
-                                       Rating = bookToAdd.Rating
+                                       Rating = NormalizeRating(rating)
                                    };
                 profile.ReadingList.Add(selectedBook);
             }
 
             return new HttpResponseMessage<SelectedBook>(selectedBook);
+        }
+
+        private int NormalizeRating(int rating)
+        {
+            return rating < 0 ? 0 : rating > 5 ? 5 : rating;
         }
 
         public HttpResponseMessage RemoveBookFromReadingList(int id, int bookId)
