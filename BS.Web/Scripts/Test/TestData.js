@@ -1,5 +1,4 @@
-﻿
-var profileData = {
+﻿var profileData = {
     Id: 'profiles/1',
     Email: 'an@email.com',
     Name: 'My Name',

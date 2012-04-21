@@ -16,11 +16,7 @@
             </tr>
         </tbody>
     </table>
-    <ul data-bind="foreach: ReadingList">
-        <li data-bind="text: Id"></li>
-    </ul>
 </div>
-
 
 <h2>All Books</h2>
 <table>
@@ -29,8 +25,8 @@
         <tr>
             <td data-bind="text: Title" ></td>
             <td data-bind="text: Author" ></td>
-            <td><input type="checkbox" data-bind="checked: isSelected" /></td>
-            <td data-bind="text: UserRating"></td>
+            <td><input type="checkbox" data-bind="checked: IsSelected" /></td>
+            <td><select data-bind="options: $parent.availableRatings, value: UserRating" ></select> </td>
         </tr>
     </tbody>
 </table>

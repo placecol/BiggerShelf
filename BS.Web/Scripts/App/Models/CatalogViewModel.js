@@ -6,50 +6,111 @@
     BS.CatalogViewModel = function (options) {
         var self = this;
 
-        self.books = ko.mapping.fromJS([]);
-        self.profile = ko.mapping.fromJS({ Email: "", ReadingList: [] });
+        var mapping = {
+            'ReadingList': {
+                key: function (d) {
+                    return ko.utils.unwrapObservable(d.Id);
+                }
+            },
+            'Friends': {
+                key: function (d) {
+                    return ko.utils.unwrapObservable(d.Id);
+                }
+            },
+            'books': {
+                create: function (options) {
+                    var readingListDetails = self.getBookFromReadingList(options.data.Id);
+                    var book = new BS.Book(options.data, readingListDetails);
+                    book.IsSelected.subscribe(self.bookSelectionChanged, book);
+                    book.UserRating.subscribe(self.bookRatingChanged, book);
+                    return book;
+                }
+            }
+        };
 
-        // get the current profile and books asynchronously!
+        self.books = ko.mapping.fromJS([], mapping);
+        self.profile = ko.mapping.fromJS({ Email: "", ReadingList: [] }, mapping);
+        self.availableRatings = [0,1,2,3,4,5];
+
+        // get the current profile and books
         var booksReq = $.ajax({
             type: "GET",
             url: "api/books",
             dataType: "json",
-            cache: false,
-            statusCode: {
-                304: function (args) {
-                    alert(args);
-                }
-            }
+            cache: false
         });
 
         var profileReq = $.ajax({
             type: "GET",
             url: "api/" + options.profileId,
-            dataType: "json",
-            statusCode: {
-                304: function (args) {
-                    alert("304 error");
-                    alert(args);
-                }
-            }
+            dataType: "json"
         });
 
         $.when(profileReq, booksReq)
             .then(
                 function (a1, a2) {
+
                     var profileData = a1[0];
-                    ko.mapping.fromJS({ profile: new BS.Profile(profileData) }, {}, self);
+                    ko.mapping.fromJS({ profile: profileData }, mapping, self);
 
                     var bookData = a2[0];
-                    var mapping = {
-                        'books': {
-                            create: function (options) {
-                                return new BS.Book(options.data, self.profile);
-                            }
-                        }
-                    };
                     ko.mapping.fromJS({ books: bookData }, mapping, self);
                 },
                 function (a1, a2, a3) { debugger; });
+
+        self.bookSelectionChanged = function (newValue) {
+            if (!newValue) {
+                self.removeBookFromReadingList(this);
+            } else {
+                self.addBookToReadingList(this);
+            }
+        };
+
+        self.bookRatingChanged = function (newRating) {
+            var book = this;
+            if (!book.IsSelected()) {
+                this.IsSelected(true);
+            } else {
+                self.updateBookOnReadingList(book);
+            }
+        };
+
+        self.addBookToReadingList = function (book) {
+            $.ajax({
+                type: "POST",
+                url: "api/" + self.profile.Id() + "/" + book.Id(),
+                data: { Rating: book.UserRating() },
+                dataType: "json"
+            }).success(function (res) {
+                self.profile.ReadingList.push(res);
+            }).error(function (res) { debugger; });
+        };
+
+        self.updateBookOnReadingList = function (book) {
+            $.ajax({
+                type: "PUT",
+                url: "api/" + self.profile.Id() + "/" + book.Id(),
+                data: { Rating: book.UserRating() },
+                dataType: "json"
+            }).error(function (res) { debugger; });
+        }
+
+        self.removeBookFromReadingList = function (book) {
+            $.ajax({
+                type: "DELETE",
+                url: "api/" + self.profile.Id() + "/" + book.Id(),
+                dataType: "json",
+                success: function (data) {
+                    self.profile.ReadingList.mappedRemove({ Id: book.Id });
+                },
+                error: function (req, status, error) { debugger; }
+            });
+        }
+
+        self.getBookFromReadingList = function (id) {
+            var index = self.profile.ReadingList.mappedIndexOf({ Id: id });
+            if (index == -1) return null;
+            return self.profile.ReadingList()[index];
+        }
     }
 })();
