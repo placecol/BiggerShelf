@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Kaiser.BiggerShelf.Web.Infrastructure.Raven;
 using Kaiser.BiggerShelf.Web.Models;
 
 namespace Kaiser.BiggerShelf.Web.Controllers.Api
@@ -10,9 +11,9 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
             return Docs.Query<Book>();
         }
 
-        public Book Get(int id)
-        {
-            return Docs.Load<Book>("books/" + id);
-        }
+        //public Book Get(RavenId<Book> id)
+        //{
+        //    return Docs.Load<Book>(id.ToString());
+        //}
     }
 }

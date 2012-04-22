@@ -6,6 +6,11 @@
     BS.CatalogViewModel = function (options) {
         var self = this;
 
+        // setup history callbacks
+//        var self.history = window.History;
+//        if (!self.history.enabled) alert('history not enabled');
+
+        // retrieve data and apply mappings
         var mapping = {
             'ReadingList': {
                 key: function (d) {
@@ -30,7 +35,7 @@
 
         self.books = ko.mapping.fromJS([], mapping);
         self.profile = ko.mapping.fromJS({ Email: "", ReadingList: [] }, mapping);
-        self.availableRatings = [0,1,2,3,4,5];
+        self.availableRatings = [0, 1, 2, 3, 4, 5];
 
         // get the current profile and books
         var booksReq = $.ajax({
@@ -67,6 +72,8 @@
         };
 
         self.bookRatingChanged = function (newRating) {
+            if (newRating == 0) return;
+
             var book = this;
             if (!book.IsSelected()) {
                 this.IsSelected(true);
@@ -76,18 +83,14 @@
         };
 
         self.addBookToReadingList = function (book) {
-            $.ajax({
-                type: "POST",
-                url: "api/" + self.profile.Id() + "/" + book.Id(),
-                data: { Rating: book.UserRating() },
-                dataType: "json"
-            }).success(function (res) {
-                self.profile.ReadingList.push(res);
-            }).error(function (res) { debugger; });
+            return self.updateBookOnReadingList(book)
+                        .success(function (res) {
+                            self.profile.ReadingList.push(res);
+                        });
         };
 
         self.updateBookOnReadingList = function (book) {
-            $.ajax({
+            return $.ajax({
                 type: "PUT",
                 url: "api/" + self.profile.Id() + "/" + book.Id(),
                 data: { Rating: book.UserRating() },
@@ -102,6 +105,7 @@
                 dataType: "json",
                 success: function (data) {
                     self.profile.ReadingList.mappedRemove({ Id: book.Id });
+                    book.UserRating(0);
                 },
                 error: function (req, status, error) { debugger; }
             });

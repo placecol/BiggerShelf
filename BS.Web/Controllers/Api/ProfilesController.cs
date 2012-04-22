@@ -3,18 +3,18 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Principal;
 using System.Web.Http.Hosting;
+using Kaiser.BiggerShelf.Web.Infrastructure.Raven;
 using Kaiser.BiggerShelf.Web.Models;
 
 namespace Kaiser.BiggerShelf.Web.Controllers.Api
 {
     public class ProfilesController : RavenApiController
     {
-        public HttpResponseMessage<Profile> Get(int id)
+        public HttpResponseMessage<Profile> Get(RavenId<Profile> id)
         {
-            var fullId = string.Format("profiles/{0}", id);
-            return fullId != GetUser().Id
+            return id.ToString() != GetUser().Id
                        ? new HttpResponseMessage<Profile>(HttpStatusCode.Forbidden)
-                       : new HttpResponseMessage<Profile>(Docs.Load<Profile>(fullId));
+                       : new HttpResponseMessage<Profile>(Docs.Load<Profile>(id.ToString()));
         }
 
         private Profile GetUser()
@@ -23,129 +23,62 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
             return Docs.Query<Profile>().Single(p => p.AspNetUserGuid == userName);
         }
 
-        //public IQueryable<FriendProfile> GetFriends(string id)
-        //{
-        //    var profile = Docs.Load<Profile>(id);
-        //    return profile.Friends.AsQueryable();
-        //}
-
-        //public FriendProfile GetFriend(string id, string friendId)
-        //{
-        //    var profile = Docs.Load<Profile>(id);
-        //    return profile.Friends.SingleOrDefault(f => f.Id == friendId);
-        //}
-
-        //public void PutFriend(string id, string friendId, FriendProfile friend)
-        //{
-        //    var profile = Docs.Load<Profile>(id);
-        //    if (profile == null) return;
-
-        //    var currentFriend = profile.Friends.SingleOrDefault(f => f.Id == friendId);
-        //    if (currentFriend == null)
-        //    {
-        //        friend.Id = friendId;
-        //        profile.Friends.Add(friend);
-        //    }
-        //    else
-        //    {
-        //        currentFriend.Name = friend.Name;
-        //    }
-        //}
-
-        //public void PostFriend(string id, string friendId, FriendProfile friend)
-        //{
-        //    var profile = Docs.Load<Profile>(id);
-        //    if (profile == null) return;
-
-        //    var currentFriend = profile.Friends.SingleOrDefault(f => f.Id == friendId);
-        //    if (currentFriend == null)
-        //    {
-        //        friend.Id = friendId;
-        //        profile.Friends.Add(friend);
-        //    }
-        //}
-
-        //public void DeleteFriend(string id, string friendId)
-        //{
-        //    var profile = Docs.Load<Profile>(id);
-        //    if (profile == null) return;
-
-        //    var currentFriend = profile.Friends.SingleOrDefault(f => f.Id == friendId);
-        //    if (currentFriend != null)
-        //    {
-        //        profile.Friends.Remove(currentFriend);
-        //    }
-        //}
-
-
-        public IQueryable<SelectedBook> GetReadingList(int id)
+        public IQueryable<SelectedBook> GetBooks(RavenId<Profile> id)
         {
-            var profile = Docs.Load<Profile>("profiles/" + id);
+            var profile = Docs.Load<Profile>(id.ToString());
             return profile.ReadingList.AsQueryable();
         }
 
-        public HttpResponseMessage<SelectedBook> GetBookFromReadingList(int id, int bookId)
+        public HttpResponseMessage<SelectedBook> GetBook(RavenId<Profile> id, RavenId<Book> bookId)
         {
-            var profile = Docs.Load<Profile>("profiles/" + id);
+            var profile = Docs.Load<Profile>(id.ToString());
             if (profile == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
 
-            return new HttpResponseMessage<SelectedBook>(profile.ReadingList.SingleOrDefault(b => b.Id == "books" + bookId));
+            return new HttpResponseMessage<SelectedBook>(profile.ReadingList.SingleOrDefault(b => b.Id == bookId.ToString()));
         }
 
-        public HttpResponseMessage UpdateBookRating(int id, int bookId, int rating)
+        public HttpResponseMessage RemoveBook(RavenId<Profile> id, RavenId<Book> bookId)
         {
-            var profile = Docs.Load<Profile>("profiles/" + id);
+            var profile = Docs.Load<Profile>(id.ToString());
             if (profile == null) return new HttpResponseMessage(HttpStatusCode.NotFound);
 
-            var selectedBook = profile.ReadingList.SingleOrDefault(f => f.Id == "books/" + bookId);
-
-            if (selectedBook == null)
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
-
-            selectedBook.Rating = NormalizeRating(rating);
-            return new HttpResponseMessage(HttpStatusCode.OK);
-        }
-
-        public HttpResponseMessage<SelectedBook> AddBookToReadingList(int id, int bookId, int rating = 0)
-        {
-            var profile = Docs.Load<Profile>("profiles/" + id);
-            if (profile == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
-
-            var book = Docs.Load<Book>("books/" + bookId);
-            if (book == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
-
-            var selectedBook = profile.ReadingList.SingleOrDefault(b => b.Id == "books/" + bookId);
-            if (selectedBook == null)
-            {
-                selectedBook = new SelectedBook
-                                   {
-                                       Id = book.Id,
-                                       Title = book.Title,
-                                       Rating = NormalizeRating(rating)
-                                   };
-                profile.ReadingList.Add(selectedBook);
-            }
-
-            return new HttpResponseMessage<SelectedBook>(selectedBook);
-        }
-
-        private int NormalizeRating(int rating)
-        {
-            return rating < 0 ? 0 : rating > 5 ? 5 : rating;
-        }
-
-        public HttpResponseMessage RemoveBookFromReadingList(int id, int bookId)
-        {
-            var profile = Docs.Load<Profile>("profiles/" + id);
-            if (profile == null) return new HttpResponseMessage(HttpStatusCode.NotFound);
-
-            var selectedBook = profile.ReadingList.SingleOrDefault(b => b.Id == "books/" + bookId);
+            var selectedBook = profile.ReadingList.SingleOrDefault(b => b.Id == bookId.ToString());
             if (selectedBook != null)
             {
                 profile.ReadingList.Remove(selectedBook);
             }
 
             return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        public HttpResponseMessage<SelectedBook> UpdateBook(RavenId<Profile> id, RavenId<Book> bookId, int rating = 0)
+        {
+            var profile = Docs.Load<Profile>(id.ToString());
+            if (profile == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
+
+            var book = Docs.Load<Book>(bookId.ToString());
+            if (book == null) return new HttpResponseMessage<SelectedBook>(HttpStatusCode.NotFound);
+
+            var selectedBook = profile.ReadingList.SingleOrDefault(b => b.Id == bookId.ToString());
+
+            if (selectedBook == null)
+            {
+                selectedBook = new SelectedBook
+                               {
+                                   Id = book.Id,
+                                   Title = book.Title
+                               };
+                profile.ReadingList.Add(selectedBook);
+            }
+            
+            selectedBook.Rating = NormalizeRating(rating);
+
+            return new HttpResponseMessage<SelectedBook>(selectedBook, HttpStatusCode.OK);
+        }
+
+        private int NormalizeRating(int rating)
+        {
+            return rating < 0 ? 0 : rating > 5 ? 5 : rating;
         }
     }
 }

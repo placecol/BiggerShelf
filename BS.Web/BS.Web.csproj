@@ -152,7 +152,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\Api\RavenIdBinderProvider.cs" />
+    <Compile Include="Infrastructure\Api\RavenIdBinder.cs" />
     <Compile Include="Infrastructure\Raven\DocumentStoreHolder.cs" />
+    <Compile Include="Infrastructure\Raven\RavenId.cs" />
     <Compile Include="Models\Indexes\Book_ByTitle.cs" />
     <Compile Include="Models\Indexes\Profile_ByBookId.cs" />
     <Compile Include="Models\Indexes\Profile_ByBookTitle.cs" />
@@ -200,6 +203,16 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\App\Models\Book.js" />
     <Content Include="Scripts\App\Models\CatalogViewModel.js" />
+    <Content Include="Scripts\history.js\amplify.store.js" />
+    <Content Include="Scripts\history.js\history.adapter.dojo.js" />
+    <Content Include="Scripts\history.js\history.adapter.jquery.js" />
+    <Content Include="Scripts\history.js\history.adapter.mootools.js" />
+    <Content Include="Scripts\history.js\history.adapter.prototype.js" />
+    <Content Include="Scripts\history.js\history.adapter.yui.js" />
+    <Content Include="Scripts\history.js\history.adapter.zepto.js" />
+    <Content Include="Scripts\history.js\history.html4.js" />
+    <Content Include="Scripts\history.js\history.js" />
+    <Content Include="Scripts\history.js\json2.js" />
     <Content Include="Scripts\jquery-1.6.2-vsdoc.js" />
     <Content Include="Scripts\jquery-1.6.2.js" />
     <Content Include="Scripts\jquery-1.6.2.min.js" />
@@ -239,7 +252,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Infrastructure\Api\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

@@ -1,8 +1,12 @@
-﻿using System.Web;
+﻿using System;
+using System.Collections.Generic;
+using System.Web;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Kaiser.BiggerShelf.Web.Infrastructure.Api;
 using Kaiser.BiggerShelf.Web.Infrastructure.Raven;
 using Raven.Client;
 
@@ -53,19 +57,16 @@ namespace Kaiser.BiggerShelf.Web
                                 new {controller = "Books", action = "Get"});
             routes.MapHttpRoute("GetProfile", "api/profiles/{id}",
                                 new { controller = "Profiles", action = "Get" });
-            routes.MapHttpRoute("GetReadingList", "api/profiles/{id}/books",
-                                new {controller = "Profiles", action = "GetReadingList"});
-            routes.MapHttpRoute("GetBookFromReadingList", "api/profiles/{id}/books/{bookId}",
-                                new {controller = "Profiles", action = "GetBookFromReadingList"},
+            routes.MapHttpRoute("GetBooksForProfile", "api/profiles/{id}/books",
+                                new {controller = "Profiles", action = "GetBooks"});
+            routes.MapHttpRoute("GetBookForProfile", "api/profiles/{id}/books/{bookId}",
+                                new {controller = "Profiles", action = "GetBook"},
                                 new {httpMethod = new HttpMethodConstraint(new[] {"GET"})});
-            routes.MapHttpRoute("AddBookToReadingList", "api/profiles/{id}/books/{bookId}",
-                                new {controller = "Profiles", action = "AddBookToReadingList"},
-                                new {httpMethod = new HttpMethodConstraint(new[] {"POST"})});
-            routes.MapHttpRoute("UpdateBookRating", "api/profiles/{id}/books/{bookId}",
-                                new {controller = "Profiles", action = "UpdateBookRating"},
+            routes.MapHttpRoute("UpdateBookForProfile", "api/profiles/{id}/books/{bookId}",
+                                new {controller = "Profiles", action = "UpdateBook"},
                                 new {httpMethod = new HttpMethodConstraint(new[] {"PUT"})});
-            routes.MapHttpRoute("RemoveBookFromReadingList", "api/profiles/{id}/books/{bookId}",
-                                new {controller = "Profiles", action = "RemoveBookFromReadingList"},
+            routes.MapHttpRoute("RemoveBookFromProfile", "api/profiles/{id}/books/{bookId}",
+                                new {controller = "Profiles", action = "RemoveBook"},
                                 new {httpMethod = new HttpMethodConstraint(new[] {"DELETE"})});
 
             routes.MapRoute(
@@ -83,6 +84,17 @@ namespace Kaiser.BiggerShelf.Web
             RegisterRoutes(RouteTable.Routes);
 
             BundleTable.Bundles.RegisterTemplateBundles();
+
+            RegisterBinders();
+        }
+
+        private void RegisterBinders()
+        {
+            IEnumerable<object> modelBinderProviderServices = GlobalConfiguration.Configuration.ServiceResolver.GetServices(typeof(ModelBinderProvider));
+            List<Object> services = new List<object>();
+            services.Add(new RavenIdBinderProvider());
+            services.AddRange(modelBinderProviderServices);
+            GlobalConfiguration.Configuration.ServiceResolver.SetServices(typeof(ModelBinderProvider), services.ToArray());
         }
     }
 }

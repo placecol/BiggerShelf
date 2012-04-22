@@ -27,7 +27,33 @@ test('Retrieve current profile and books',
     }
 );
 
-test('Deselecting a book removes it from the user\'s reading list.',
+    test('Selecting a book adds it to the user\'s reading list.',
+    function () {
+        var server = this.sandbox.useFakeServer();
+        server.respondWith("GET", "api/profiles/1",
+            [200, { "Content-Type": "application/json" },
+                JSON.stringify(profileData)]);
+        server.respondWith("GET", /api\/books\?.*/,
+            [200, { "Content-Type": "application/json" },
+                JSON.stringify(bookData)]);
+
+        var catalog = new BS.CatalogViewModel({ profileId: 'profiles/1' });
+        server.respond();
+
+        // books/4 is not selected, so let's select it
+        server.respondWith("PUT", "api/profiles/1/books/4",
+            [200, { "Content-Type": "application/json" },
+                '{"Id": "books/4", "Title": "Book \#4", "Rating": 3}']);
+        catalog.books()[3].IsSelected(true);
+        server.respond();
+
+        equal(true, catalog.books()[3].IsSelected(), 'books/4 should be marked as selected.');
+        equal(true, catalog.getBookFromReadingList(catalog.books()[3].Id()) != null, 'books/4 should be on the reading list.');
+        equal(3, server.requests.length, 'three requests should have been made to the server');
+    }
+);
+
+    test('Deselecting a book removes it from the user\'s reading list.',
     function () {
         var server = this.sandbox.useFakeServer();
         server.respondWith("GET", "api/profiles/1",
@@ -42,11 +68,12 @@ test('Deselecting a book removes it from the user\'s reading list.',
 
         // books/1 is selected, so let's deselect it
         server.respondWith("DELETE", "api/profiles/1/books/1",
-            [200, { "Content-Type": "application/json" },'']);
+            [200, { "Content-Type": "application/json" }, '']);
         catalog.books()[0].IsSelected(false);
         server.respond();
 
         equal(false, catalog.books()[0].IsSelected(), 'books/1 should no longer be marked as selected.');
+        equal(0, catalog.books()[0].UserRating(), 'books/1 should have a rating of zero.');
         equal(null, catalog.getBookFromReadingList(catalog.books()[0].Id()), 'books/1 should no longer be on the reading list.');
         equal(3, server.requests.length, 'three requests should have been made to the server');
     }
@@ -92,7 +119,7 @@ test('Deselecting a book removes it from the user\'s reading list.',
             server.respond();
 
             // was 4 changing to 1
-            server.respondWith("POST", "api/profiles/1/books/4",
+            server.respondWith("PUT", "api/profiles/1/books/4",
                 [200, { "Content-Type": "application/json" },
                     '{"Id": "books/4", "Title": "Book \#4", "Rating": 3}']);
             var book4 = catalog.books()[3];
