@@ -1,53 +1,75 @@
-﻿using System.Linq;
-using Kaiser.BiggerShelf.Web.Models.Views;
+﻿using System;
+using System.Linq;
 using Raven.Abstractions.Indexing;
 using Raven.Client.Indexes;
 
 namespace Kaiser.BiggerShelf.Web.Models.Indexes
 {
-    public class Profile_ByBookTitle : AbstractMultiMapIndexCreationTask<BookView>
+    public class Profile_ByBookTitle : AbstractMultiMapIndexCreationTask<Profile_ByBookTitle.Result>
     {
+        public class Result
+        {
+            public string Id { get; set; }
+            public string ProfileIds { get; set; }
+            public string Query { get; set; }
+            public bool IsBook { get; set; }
+            public string Title { get; set; }
+            public int Rating { get; set; }
+            public DateTime? PublishDate { get; set; }
+        }
+
         public Profile_ByBookTitle()
         {
             AddMap<Profile>(profiles => from profile in profiles
-                                        from book in profile.ReadingList
+                                        from book in profile.ReadingList.DefaultIfEmpty()
+                                        where book != null
                                         select
-                                            new BookView
+                                            new
                                                 {
                                                     Id = book.Id,
-                                                    ProfileId = profile.Id,
+                                                    ProfileIds = new [] {profile.Id},
+                                                    Query = string.Empty,
+                                                    IsBook = false,
                                                     Title = string.Empty,
-                                                    ASIN = string.Empty,
-                                                    Author = string.Empty,
+                                                    Rating = 0,
+                                                    PublishDate = string.Empty
                                                 });
 
             AddMap<Book>(books => from book in books
                                   select
-                                      new BookView
+                                      new
                                           {
                                               Id = book.Id,
-                                              ProfileId = string.Empty,
+                                              ProfileIds = new [] {string.Empty},
+                                              Query = new[] { book.Title, book.ASIN, book.Author },
+                                              IsBook = true,
                                               Title = book.Title,
-                                              ASIN = book.ASIN,
-                                              Author = book.Author,
+                                              Rating = book.Rating,
+                                              PublishDate = book.PublishDate
                                           });
 
             Reduce = results => from result in results
                                 group result by result.Id
                                 into g
-                                from profile in g.Where(p => p.ProfileId != string.Empty).DefaultIfEmpty()
-                                from book in g.Where(p => p.ProfileId == string.Empty).DefaultIfEmpty()
                                 select
-                                    new BookView
+                                    new
                                         {
-                                            ProfileId = profile.ProfileId,
                                             Id = g.Key,
-                                            Title = book.Title,
-                                            ASIN = book.ASIN,
-                                            Author = book.Author
+                                            ProfileIds = g.SelectMany(r => r.ProfileIds).ToArray(),
+                                            Query = g.Where(b => b.IsBook).Select(b => b.Query),
+                                            IsBook = true,
+                                            Title = g.Where(b => b.IsBook).Select(b => b.Title),
+                                            Rating = g.Where(b => b.IsBook).Select(b => b.Rating),
+                                            PublishDate = g.Where(b => b.IsBook).Select(b => b.PublishDate)
                                         };
 
-            Index(b => b.Title, FieldIndexing.Analyzed);
+            TransformResults = (database, results) =>
+                               from result in results
+                               let book = database.Load<Book>(result.Id)
+                               select book;
+
+            Index(r => r.ProfileIds, FieldIndexing.Analyzed);
+            Index(r => r.Query, FieldIndexing.Analyzed);
         }
     }
 }

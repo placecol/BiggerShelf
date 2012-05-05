@@ -4,18 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div data-bind="with: profile">
-    <h2>Books for <span data-bind="text: Email"></span></h2>
-    <table>
-        <thead><tr><th>Id</th><th>Title</th><th>My Rating</th></tr></thead>
-        <tbody data-bind="foreach: ReadingList">
-            <tr>
-                <td data-bind="text: Id" ></td>
-                <td data-bind="text: Title" ></td>
-                <td data-bind="text: Rating"></td>
-            </tr>
-        </tbody>
-    </table>
+<div>
+    <input type="text" data-bind="resetPage: filters.search"/>
+    <button data-bind="click: filters.nextPage, enable: NotOnLastPage">More</button>
+    <button data-bind="click: filters.prevPage, enable: NotOnFirstPage">Less</button>
+    <select data-bind="options: profile.Friends, optionsText: 'Name', selectedOptions: filters.friends" multiple="true"></select>
 </div>
 
 <h2>All Books</h2>
@@ -38,9 +31,10 @@
     <script src="~/Scripts/knockout.mapping-latest.debug.js"></script>
     <script src="~/Scripts/history.js/history.js"></script>
     <script src="~/Scripts/history.js/history.adapter.jquery.js"></script>
-    <script src="~/Scripts/App/Models/CatalogViewModel.js"></script>
+    @*<script src="~/Scripts/history.js/history.html4.js"></script>*@
     <script src="~/Scripts/App/Models/Book.js"></script>
-    <script src="~/Scripts/App/Models/Profile.js"></script>
+    <script src="~/Scripts/App/Models/Filters.js"></script>
+    <script src="~/Scripts/App/Models/CatalogViewModel.js"></script>
     <script>
         $(function () {
             ko.applyBindings(new BS.CatalogViewModel({profileId: "@Model.Id"}));

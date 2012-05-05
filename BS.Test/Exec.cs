@@ -1,15 +1,27 @@
 ﻿using System;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Principal;
 using System.Web.Http.Hosting;
 using Kaiser.BiggerShelf.Web.Controllers.Api;
 using Raven.Client;
 using Raven.Client.Embedded;
+using Raven.Client.Indexes;
+using Raven.Client.Listeners;
 
 namespace Kaiser.BiggerShelf.Test
 {
     public static class Exec
     {
+        public class NoStaleQueriesListener : IDocumentQueryListener
+        {
+            public void BeforeQueryExecuted(IDocumentQueryCustomization queryCustomization)
+            {
+                queryCustomization.WaitForNonStaleResults();
+            }
+        }
+
+
         public static void InStore(object[] dbObjects = null, Action<IDocumentStore> action = null)
         {
             using (var store = new EmbeddableDocumentStore())
@@ -17,6 +29,10 @@ namespace Kaiser.BiggerShelf.Test
                 store.Configuration.RunInMemory = true;
                 store.Configuration.RunInUnreliableYetFastModeThatIsNotSuitableForProduction = true;
                 store.Initialize();
+
+                store.RegisterListener(new NoStaleQueriesListener());
+
+                IndexCreation.CreateIndexes(Assembly.GetAssembly(typeof(BooksController)), store);
 
                 using (var session = store.OpenSession())
                 {

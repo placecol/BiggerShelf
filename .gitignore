@@ -8,6 +8,7 @@ _ReSharper.*
 *.resharper
 *.suo
 *.cache
+*.DotSettings.user
 ~$*
 packages/RavenDB*/server/Data
 packages/RavenDB*/server/Data/*
