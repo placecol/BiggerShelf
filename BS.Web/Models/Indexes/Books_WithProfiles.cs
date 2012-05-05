@@ -5,7 +5,7 @@ using Raven.Client.Indexes;
 
 namespace Kaiser.BiggerShelf.Web.Models.Indexes
 {
-    public class Profile_ByBookTitle : AbstractMultiMapIndexCreationTask<Profile_ByBookTitle.Result>
+    public class Books_WithProfiles : AbstractMultiMapIndexCreationTask<Books_WithProfiles.Result>
     {
         public class Result
         {
@@ -18,7 +18,7 @@ namespace Kaiser.BiggerShelf.Web.Models.Indexes
             public DateTime? PublishDate { get; set; }
         }
 
-        public Profile_ByBookTitle()
+        public Books_WithProfiles()
         {
             AddMap<Profile>(profiles => from profile in profiles
                                         from book in profile.ReadingList.DefaultIfEmpty()

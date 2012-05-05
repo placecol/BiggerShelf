@@ -19,16 +19,18 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
         public IQueryable<Book> Get(string profileIds = null, string search = null, BookOrder orderBy = BookOrder.Default, int skip = 0, int take = 128)
         {
             var query = Docs
-                .Query<Profile_ByBookTitle.Result, Profile_ByBookTitle>();
+                .Query<Books_WithProfiles.Result, Books_WithProfiles>();
 
             if (!string.IsNullOrWhiteSpace(profileIds))
-                query = query.Search(r => r.ProfileIds, string.Join(" ", profileIds.Split(',')), options:SearchOptions.And);
+                query = query.Search(r => r.ProfileIds,
+                                     string.Join(" ", profileIds.Split(',')),
+                                     options: SearchOptions.And);
 
             if (!string.IsNullOrWhiteSpace(search))
                 query = query.Search(r => r.Query, search, options:SearchOptions.And);
 
 
-            query = (IRavenQueryable<Profile_ByBookTitle.Result>)
+            query = (IRavenQueryable<Books_WithProfiles.Result>)
                     query
                         .Skip(skip)
                         .Take(take);
@@ -36,7 +38,7 @@ namespace Kaiser.BiggerShelf.Web.Controllers.Api
             switch (orderBy)
             {
                 case BookOrder.Default:
-                    query = (IRavenQueryable<Profile_ByBookTitle.Result>)
+                    query = (IRavenQueryable<Books_WithProfiles.Result>)
                             query.OrderByDescending(b => b.Rating)
                                 .ThenByDescending(b => b.PublishDate);
                     break;

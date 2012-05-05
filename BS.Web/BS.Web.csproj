@@ -153,7 +153,7 @@
     <Compile Include="Infrastructure\Api\RavenIdBinder.cs" />
     <Compile Include="Infrastructure\Raven\DocumentStoreHolder.cs" />
     <Compile Include="Infrastructure\Raven\RavenId.cs" />
-    <Compile Include="Models\Indexes\Profile_ByBookTitle.cs" />
+    <Compile Include="Models\Indexes\Books_WithProfiles.cs" />
     <Compile Include="Models\BigShelfRavenDbInitializer.cs" />
     <Compile Include="Models\Book.cs" />
     <Compile Include="Models\Category.cs" />
